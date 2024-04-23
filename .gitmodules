@@ -1,0 +1,15 @@
+[submodule "CROSSCON-Hypervisor"]
+	path = CROSSCON-Hypervisor
+	url = git@github.com:crosscon/CROSSCON-Hypervisor.git
+[submodule "optee_client"]
+	path = optee_client
+	url = git@github.com:crosscon/optee_client.git
+[submodule "optee_os"]
+	path = optee_os
+	url = git@github.com:crosscon/optee_os.git
+[submodule "opensbi"]
+	path = opensbi
+	url = https://github.com/bao-project/opensbi.git
+[submodule "linux"]
+	path = linux
+	url = git@github.com:crosscon/linux.git
