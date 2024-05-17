@@ -13,3 +13,6 @@
 [submodule "linux"]
 	path = linux
 	url = git@github.com:crosscon/linux.git
+[submodule "optee_test"]
+	path = optee_test
+	url = https://github.com/crosscon/optee_test.git
