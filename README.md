@@ -39,53 +39,468 @@ Before you jump to Demos you need to install each Tool in the following list:
 #### How to experiment CROSSCON Hypervisor Per-VM TEE feature?
 This experiment will use OP-TEE as trusted OS and will be carry out in qemu.
 
-To install qemu we recommend the following:
+## Build OP-TEE-OS
 
-Clone the repo:
+``` sh
+cd optee_os
+```
+### Build for aarch64
+``` sh
+OPTEE_DIR="./"
+export O="$OPTEE_DIR/optee"
+CC="aarch64-none-elf-"
+export CFLAGS=-Wno-cast-function-type
+PLATFORM="vexpress"
+PLATFORM_FLAVOR="qemu_armv8a"
+ARCH="arm"
+SHMEM_START="0x70000000"
+SHMEM_SIZE="0x00200000"
+TZDRAM_START="0x10100000"
+TZDRAM_SIZE="0x00F00000"
+CFG_GIC=n
+
+rm -rf $O
+
+compiledb make -C $OPTEE_DIR \
+    O="$OPTEE_DIR/optee" \
+    CROSS_COMPILE=$CC \
+    PLATFORM=$PLATFORM \
+    PLATFORM_FLAVOR=$PLATFORM_FLAVOR \
+    ARCH=$ARCH \
+    CFG_PKCS11_TA=n \
+    CFG_SHMEM_START=$SHMEM_START \
+    CFG_SHMEM_SIZE=$SHMEM_SIZE \
+    CFG_CORE_DYN_SHM=n \
+    CFG_CORE_RESERVED_SHM=y \
+    CFG_CORE_ASYNC_NOTIF=n \
+    CFG_TZDRAM_SIZE=$TZDRAM_SIZE \
+    CFG_TZDRAM_START=$TZDRAM_START \
+    CFG_GIC=y \
+    CFG_ARM_GICV2=y \
+    CFG_CORE_IRQ_IS_NATIVE_INTR=n \
+    CFG_ARM64_core=y \
+    CFG_USER_TA_TARGETS=ta_arm64 \
+    CFG_DT=n \
+    CFG_CORE_ASLR=n \
+    CFG_TEE_CORE_LOG_LEVEL=0 \
+    CFG_CORE_WORKAROUND_SPECTRE_BP=n \
+    CFG_CORE_WORKAROUND_NSITR_CACHE_PRIME=n \
+    CFG_TEE_CORE_LOG_LEVEL=1 \
+    DEBUG=1 -j16
+
+
+OPTEE_DIR="./"
+export O="$OPTEE_DIR/optee2"
+SHMEM_START="0x70200000"
+TZDRAM_START="0x20100000"
+
+rm -rf $O
+
+compiledb make -C $OPTEE_DIR \
+    O="$OPTEE_DIR/optee2" \
+    CROSS_COMPILE=$CC \
+    PLATFORM=$PLATFORM \
+    PLATFORM_FLAVOR=$PLATFORM_FLAVOR \
+    ARCH=$ARCH \
+    CFG_PKCS11_TA=n \
+    CFG_SHMEM_START=$SHMEM_START \
+    CFG_SHMEM_SIZE=$SHMEM_SIZE \
+    CFG_CORE_DYN_SHM=n \
+    CFG_CORE_RESERVED_SHM=y \
+    CFG_CORE_ASYNC_NOTIF=n \
+    CFG_TZDRAM_SIZE=$TZDRAM_SIZE \
+    CFG_TZDRAM_START=$TZDRAM_START \
+    CFG_GIC=y \
+    CFG_ARM_GICV2=y \
+    CFG_CORE_IRQ_IS_NATIVE_INTR=n \
+    CFG_ARM64_core=y \
+    CFG_USER_TA_TARGETS=ta_arm64 \
+    CFG_DT=n \
+    CFG_CORE_ASLR=n \
+    CFG_CORE_WORKAROUND_SPECTRE_BP=n \
+    CFG_CORE_WORKAROUND_NSITR_CACHE_PRIME=n \
+    CFLAGS="${CFLAGS} -DOPTEE2" \
+    CFG_EARLY_TA=y \
+    CFG_TEE_CORE_LOG_LEVEL=1 \
+    DEBUG=1 -j16
+```
+### Build for RISCV
+``` sh
+OPTEE_DIR="./"
+
+export O="$OPTEE_DIR/optee-riscv"
+
+SHMEM_START="0x88f00000"
+SHMEM_SIZE="0x00200000"
+TDDRAM_START="0x80200000"
+TDDRAM_SIZE="0x00f00000"
+
+rm -rf $O
+
+make \
+    ARCH=riscv \
+    PLATFORM=virt \
+    CROSS_COMPILE64=riscv64-unknown-linux-gnu- \
+    CROSS_COMPILE32=riscv32-unknown-linux-gnu- \
+    CFG_TDDRAM_SIZE=$TDDRAM_SIZE \
+    CFG_TDDRAM_START=$TDDRAM_START \
+    CFG_PKCS11_TA=n \
+    CFG_SHMEM_START=$SHMEM_START \
+    CFG_SHMEM_SIZE=$SHMEM_SIZE \
+    DEBUG=1 \
+    CFG_TEE_CORE_LOG_LEVEL=1 \
+    CFG_TEE_TA_LOG_LEVEL=0 \
+    CFLAGS="-Og -DTARGET_RISCV" \
+    -j16
+
+
+export O="$OPTEE_DIR/optee2-riscv"
+TDDRAM_START="0x90200000"
+SHMEM_START="0x89100000"
+
+rm -rf $O
+
+make \
+    ARCH=riscv \
+    PLATFORM=virt \
+    CROSS_COMPILE64=riscv64-unknown-linux-gnu- \
+    CROSS_COMPILE32=riscv32-unknown-linux-gnu- \
+    CFG_TDDRAM_SIZE=$TDDRAM_SIZE \
+    CFG_TDDRAM_START=$TDDRAM_START \
+    CFG_PKCS11_TA=n \
+    CFG_SHMEM_START=$SHMEM_START \
+    CFG_SHMEM_SIZE=$SHMEM_SIZE \
+    DEBUG=1 \
+    CFG_TEE_CORE_LOG_LEVEL=1 \
+    CFG_TEE_TA_LOG_LEVEL=0 \
+    CFLAGS="-Og -DOPTEE2 -DTARGET_RISCV" \
+    -j16
+```
+
+## Linux file system
+We've tested with Buildroot 2022.11.1 (https://buildroot.org/downloads/buildroot-2022.11.1.tar.gz)
+``` sh
+wget https://buildroot.org/downloads/buildroot-2022.11.1.tar.gz
+mkdir buildroot
+tar -xf buildroot-2022.11.1.tar.gz
+mv buildroot-2022.11.1 buildroot
+```
+
+Create build directories for aarch64 and riscv64:
+``` sh
+mkdir buildroot/build-aarch64
+mkdir buildroot/build-riscv64
+```
+
+Set our predefined `.config` files:
+``` sh
+cp support/br-aarch64.config buildroot/build-aarch64/.config
+cp support/br-riscv64.config buildroot/build-riscv64/.config
+```
+
+Build:
+``` sh
+cd buildroot
+
+make O=build-aarch64/ -j`nproc`
+OR
+make O=build-riscv64/ -j`nproc`
+```
+## Build OP-TEE Clients
+``` sh
+cd ..
+cd optee_client
+```
+### Build for AARCH64
+``` sh
+git checkout master
+make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out-aarch64
+git checkout optee2
+make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out2-aarch64
+```
+### Build for RISCV
+``` sh
+git checkout master
+make CROSS_COMPILE=riscv64-unknown-linux-gnu- WITH_TEEACL=0 O=out-riscv64
+git checkout optee2
+make CROSS_COMPILE=riscv64-unknown-linux-gnu- WITH_TEEACL=0 O=out2-riscv64
+```
+
+## Build OP-TEE xtest
+``` sh
+cd ..
+cd optee_test
+```
+
+### Build for AARCH64
+
+``` sh
+BUILDROOT=`pwd`/../buildroot/build-aarch64/
+export CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export ARCH=aarch64
+export PLATFORM=plat-vexpress
+export PLATFORM_FLAVOR=qemu_armv8a
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee/export-ta_arm64
+export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
+export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=y
+export DESTDIR=./to_buildroot-aarch64
+export DEBUG=0
+export CFG_TEE_TA_LOG_LEVEL=0
+export CFLAGS=-O2
+export O=`pwd`/out-aarch64
+export CFG_PKCS11_TA=n
+
+rm -rf $O
+rm -rf to_buildroot-aarch64/
+find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+make clean
+compiledb make -j`nproc`
+make install
+
+
+export O=`pwd`/out2-aarch64
+export DESTDIR=./to_buildroot-aarch64-2
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2/export-ta_arm64
+export TEEC_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
+rm -rf `pwd`/out2-aarch64
+find . -name "Makefile" -exec sed -i "s/\-lteec$/\-lteec2/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee_armtz/optee2_armtz/g" {} +
+make clean
+compiledb make -j`nproc`
+make install
+find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+
+mv $DESTDIR/bin/xtest $DESTDIR/bin/xtest2
 
 ```
-git clone --recursive git@github.com:qemu/qemu.git
+
+### Build for RISCV
+``` sh
+BUILDROOT=`pwd`/../buildroot/build-riscv64/
+export CROSS_COMPILE=$BUILDROOT/host/bin/riscv64-linux-
+export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/riscv64-linux-
+export TA_CROSS_COMPILE=$BUILDROOT/host/bin/riscv64-linux-
+export ARCH=riscv
+export PLATFORM=plat-virt
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-riscv/export-ta_rv64
+export TEEC_EXPORT=`pwd`/../optee_client/out-riscv64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-riscv64/export/usr/
+export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=y
+export DESTDIR=./to_buildroot-riscv
+export DEBUG=0
+export CFG_TEE_TA_LOG_LEVEL=0
+export O=`pwd`/out-riscv
+export RISCV_TARGET=y 
+
+
+rm -rf out-riscv/
+## make sure we have things setup for first OP-TEE
+find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+make clean
+compiledb make -j`nproc`
+make install
+
+
+## setup second OP-TEE
+export O=`pwd`/out2-riscv64
+export DESTDIR=./to_buildroot-riscv-2
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2-riscv/export-ta_rv64
+export TEEC_EXPORT=`pwd`/../optee_client/out2-riscv64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-riscv64/export/usr/
+rm -rf `pwd`/out2-riscv64
+find . -name "Makefile" -exec sed -i "s/\-lteec$/\-lteec2/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee_armtz/optee2_armtz/g" {} +
+make clean
+compiledb make -j`nproc`
+make install
+## undo changes
+find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+
+mv $DESTDIR/bin/xtest $DESTDIR/bin/xtest2
+```
+
+## Finalize Linux file system
+We have everything setup now, so build the final file system for Linux
+```sh
+cd buildroot
+
+make O=build-aarch64/ -j`nproc`
+OR
+make O=build-riscv64/ -j`nproc`
+```
+
+## Build Linux
+
+Set our predefined `.config` files:
+``` sh
+mkdir linux/build-aarch64/
+cp support/linux-aarch64.config linux/build-aarch64/.config
+
+mkdir linux/build-riscv64/
+cp support/linux-riscv64.config linux/build-riscv64/.config
+```
+
+Build:
+``` sh
+make -C linux ARCH=arm64 O=build-aarch64 CROSS_COMPILE=aarch64-none-linux-gnu- -j16 Image
+OR
+make -C linux ARCH=riscv O=build-riscv64 CROSS_COMPILE=riscv64-unknown-linux-gnu- -j16 Image
+```
+
+### Bind Linux Image and device tree
+Although we reuse the Linux kernel image we need to modify the device tree for a second linux guest:
+
+```sh
+dtc -I dts -O dtb aarch64-ws/aarch64-dt1.dts > aarch64-ws/aarch64-dt1.dtb
+dtc -I dts -O dtb aarch64-ws/aarch64-dt2.dts > aarch64-ws/aarch64-dt2.dtb
+OR
+dtc -I dts -O dtb riscv64-ws/riscv64-dt1.dts > riscv64-ws/riscv64-dt1.dtb
+dtc -I dts -O dtb riscv64-ws/riscv64-dt2.dts > riscv64-ws/riscv64-dt2.dtb
+```
+#### Arm
+```sh
+cd lloader
+
+rm linux*-aarch64.bin
+rm linux*-aarch64.elf
+make  \
+    IMAGE=../linux/build-aarch64/arch/arm64/boot/Image \
+    DTB=../aarch64-ws/aarch64-dt1.dtb \
+    TARGET=linux-aarch64.bin \
+    CROSS_COMPILE=aarch64-none-elf- \
+    ARCH=aarch64
+
+make \
+    IMAGE=../linux/build-aarch64/arch/arm64/boot/Image \
+    DTB=../aarch64-ws/aarch64-dt2.dtb \
+    TARGET=linux2-aarch64.bin \
+    CROSS_COMPILE=aarch64-none-elf- \
+    ARCH=aarch64
+
+cd ..
+```
+#### RISC-V
+```sh
+cd lloader
+
+rm linux*-riscv64.bin
+rm linux*-riscv64.elf
+make \
+    IMAGE=../linux/build-riscv64/arch/riscv/boot/Image \
+    DTB=../riscv64-ws/riscv64-dt1.dtb \
+    TARGET=linux-riscv64.bin \
+    CROSS_COMPILE=riscv64-unknown-elf- \
+    ARCH=riscv
+
+make \
+    IMAGE=../linux/build-riscv64/arch/riscv/boot/Image \
+    DTB=../riscv64-ws/riscv64-dt2.dtb \
+    TARGET=linux2-riscv64.bin \
+    CROSS_COMPILE=riscv64-unknown-elf- \
+    ARCH=riscv
+	
+cd ..
+```
+
+## QEMU Setup
+We need to add a second physical UART so we need to build our own qemu (we've tested v7.2.0):
+``` sh
+git clone https://github.com/qemu/qemu
 cd qemu
-git checkout v8.0.3
+git checkout v7.2.0
+./configure --target-list="riscv64-softmmu aarch64-softmmu"  
+git apply ../support/0001-hw-riscv-virt-Add-second-uart.patch
+git apply ../support/0001-hw-arm-virt-Add-second-uart.patch
+make -j`nproc`
+
+## do this if you want to install this qemu in your system, otherwise use the compile binary directly e.g., build/aarch64-softmmu/qemu-system-aarch64 OR build/riscv64-softmmu/qemu-system-riscv64
+[ sudo make install ]
+cd ..
 ```
 
-For Arm:
+## Run the Demos
+
+Change to the aarch64-ws or riscv64-ws:
 ```
-./configure --target-list=riscv64-softmmu && make -j16 && make install
+cd aarch64-ws
+OR
+cd riscv64-ws
 ```
 
-For RISC-V:
-```
-./configure --target-list=aarch64-softmmu && make -j16 && make install
-```
-
-Install the aforementioned dependencies.
-And execute one of the demo scripts:
-
-For Arm:
-```
-./run-aarch64-demo.sh
+### Simple Demo
+This demo will instantiate a Linux VM and an OP-TEE VM
+``` sh
+./run-demo.sh
+OR
+./run-demo.sh
 ```
 
-For RISC-V:
-```
-./run-riscv64-demo.sh
-```
-
-This should boot you into a linux terminal after a few seconds.
-
-Enter `root` as the user name.
-
-After logging in as root issue the following command, to execute the tee supplicant as a background process for this session.
-
-```
+After Linux finishes booting you may initialize the tee-supplicant and run xtest as follows:
+``` sh
 tee-supplicant &
-```
-
-Now run xtest to validate OP-TEE execution, and wait for execution to complete.
-
-```
 xtest -t regression
+```
+
+### Demo 1
+This demo will instantiate two Linux VMs each with an OP-TEE VM, run:
+``` sh
+./run-demo1.sh
+OR
+./run-demo1.sh
+```
+
+Our Qemu features two UARTs. Qemu on start up will inform us of the location of the second UART (e.g., /dev/pts/tty3):
+```
+char device redirected to /dev/pts/3 (label serial1)
+
+OpenSBI v1.1
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : riscv-virtio,qemu
+Platform Features         : medeleg
+Platform HART Count       : 2
+Platform IPI Device       : aclint-mswi
+Platform Timer Device     : aclint-mtimer @ 10000000Hz
+
+```
+
+
+Again on each Linux, you may initialize the tee-supplicant and run xtest as follows:
+``` sh
+tee-supplicant &
+xtest -t regression
+```
+
+### Demo 2
+This demo will instantiate a Linux VM and two OP-TEE VMs
+``` sh
+./run-aarch64-qemu-demo2.sh
+OR
+./run-riscv64-qemu-demo2.sh
+```
+
+After Linux finishes booting you may initialize the two tee-supplicants. This setup only correctly configures the system to execute xtest in one OP-TEE VM, however you can execute TAs in the second OP-TEE
+``` sh
+tee-supplicant &
+tee-supplicant2 &
+
+xtest -t regression
+xtest2 -t regression
 ```
 
 ## License
