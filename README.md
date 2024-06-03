@@ -39,7 +39,7 @@ Before you jump to Demos you need to install each Tool in the following list:
 #### How to experiment CROSSCON Hypervisor Per-VM TEE feature?
 This experiment will use OP-TEE as trusted OS and will be carry out in qemu.
 
-## Build OP-TEE-OS
+## Step 1: Build OP-TEE-OS
 
 ``` sh
 cd optee_os
@@ -61,7 +61,7 @@ CFG_GIC=n
 
 rm -rf $O
 
-compiledb make -C $OPTEE_DIR \
+make -C $OPTEE_DIR \
     O="$OPTEE_DIR/optee" \
     CROSS_COMPILE=$CC \
     PLATFORM=$PLATFORM \
@@ -96,7 +96,7 @@ TZDRAM_START="0x20100000"
 
 rm -rf $O
 
-compiledb make -C $OPTEE_DIR \
+make -C $OPTEE_DIR \
     O="$OPTEE_DIR/optee2" \
     CROSS_COMPILE=$CC \
     PLATFORM=$PLATFORM \
@@ -123,16 +123,16 @@ compiledb make -C $OPTEE_DIR \
     CFG_EARLY_TA=y \
     CFG_TEE_CORE_LOG_LEVEL=1 \
     DEBUG=1 -j16
+
+cd ..
 ```
 ### Build for RISCV
 ``` sh
-OPTEE_DIR="./"
-
 export O="$OPTEE_DIR/optee-riscv"
 
-SHMEM_START="0x88f00000"
+SHMEM_START="0x98f00000"
 SHMEM_SIZE="0x00200000"
-TDDRAM_START="0x80200000"
+TDDRAM_START="0xb0000000"
 TDDRAM_SIZE="0x00f00000"
 
 rm -rf $O
@@ -148,15 +148,15 @@ make \
     CFG_SHMEM_START=$SHMEM_START \
     CFG_SHMEM_SIZE=$SHMEM_SIZE \
     DEBUG=1 \
-    CFG_TEE_CORE_LOG_LEVEL=1 \
-    CFG_TEE_TA_LOG_LEVEL=0 \
+    CFG_TEE_CORE_LOG_LEVEL=2 \
+    CFG_TEE_TA_LOG_LEVEL=2 \
+    CFG_VULN_PTA=y \
     CFLAGS="-Og -DTARGET_RISCV" \
     -j16
 
-
 export O="$OPTEE_DIR/optee2-riscv"
-TDDRAM_START="0x90200000"
-SHMEM_START="0x89100000"
+TDDRAM_START="0xb2000000"
+SHMEM_START="0x99100000"
 
 rm -rf $O
 
@@ -171,17 +171,20 @@ make \
     CFG_SHMEM_START=$SHMEM_START \
     CFG_SHMEM_SIZE=$SHMEM_SIZE \
     DEBUG=1 \
-    CFG_TEE_CORE_LOG_LEVEL=1 \
-    CFG_TEE_TA_LOG_LEVEL=0 \
+    CFG_TEE_CORE_LOG_LEVEL=2 \
+    CFG_TEE_TA_LOG_LEVEL=2 \
     CFLAGS="-Og -DOPTEE2 -DTARGET_RISCV" \
     -j16
+
+cd ..
 ```
 
-## Linux file system
+## Step 2: Linux file system
+We will first build an incomplete filesystem to benefit fom buildroot building
+the appropriate linux toolchains.
 We've tested with Buildroot 2022.11.1 (https://buildroot.org/downloads/buildroot-2022.11.1.tar.gz)
 ``` sh
 wget https://buildroot.org/downloads/buildroot-2022.11.1.tar.gz
-mkdir buildroot
 tar -xf buildroot-2022.11.1.tar.gz
 mv buildroot-2022.11.1 buildroot
 ```
@@ -205,10 +208,13 @@ cd buildroot
 make O=build-aarch64/ -j`nproc`
 OR
 make O=build-riscv64/ -j`nproc`
-```
-## Build OP-TEE Clients
-``` sh
+
 cd ..
+```
+
+## Step 3: Build OP-TEE Clients
+Build the optee client application library and tee supplicant for both OP-TEEs.
+``` sh
 cd optee_client
 ```
 ### Build for AARCH64
@@ -217,6 +223,8 @@ git checkout master
 make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out-aarch64
 git checkout optee2
 make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out2-aarch64
+
+cd ..
 ```
 ### Build for RISCV
 ``` sh
@@ -224,11 +232,13 @@ git checkout master
 make CROSS_COMPILE=riscv64-unknown-linux-gnu- WITH_TEEACL=0 O=out-riscv64
 git checkout optee2
 make CROSS_COMPILE=riscv64-unknown-linux-gnu- WITH_TEEACL=0 O=out2-riscv64
+
+cd ..
 ```
 
-## Build OP-TEE xtest
+## Step 4: Build OP-TEE xtest
+Build the OP-TEE xtest test suite.
 ``` sh
-cd ..
 cd optee_test
 ```
 
@@ -258,7 +268,7 @@ rm -rf to_buildroot-aarch64/
 find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
 find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
 make clean
-compiledb make -j`nproc`
+make -j`nproc`
 make install
 
 
@@ -271,13 +281,13 @@ rm -rf `pwd`/out2-aarch64
 find . -name "Makefile" -exec sed -i "s/\-lteec$/\-lteec2/g" {} +
 find . -name "Makefile" -exec sed -i "s/optee_armtz/optee2_armtz/g" {} +
 make clean
-compiledb make -j`nproc`
+make -j`nproc`
 make install
 find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
 find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
 
 mv $DESTDIR/bin/xtest $DESTDIR/bin/xtest2
-
+cd ..
 ```
 
 ### Build for RISCV
@@ -304,7 +314,7 @@ rm -rf out-riscv/
 find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
 find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
 make clean
-compiledb make -j`nproc`
+make -j`nproc`
 make install
 
 
@@ -318,17 +328,18 @@ rm -rf `pwd`/out2-riscv64
 find . -name "Makefile" -exec sed -i "s/\-lteec$/\-lteec2/g" {} +
 find . -name "Makefile" -exec sed -i "s/optee_armtz/optee2_armtz/g" {} +
 make clean
-compiledb make -j`nproc`
+make -j`nproc`
 make install
 ## undo changes
 find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
 find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
 
 mv $DESTDIR/bin/xtest $DESTDIR/bin/xtest2
+cd ..
 ```
 
-## Finalize Linux file system
-We have everything setup now, so build the final file system for Linux
+## Step 5: Finalize Linux file system
+We have everything setup now, so build the final file system for Linux.
 ```sh
 cd buildroot
 
@@ -337,7 +348,7 @@ OR
 make O=build-riscv64/ -j`nproc`
 ```
 
-## Build Linux
+## Step 6: Build Linux
 
 Set our predefined `.config` files:
 ``` sh
@@ -346,13 +357,17 @@ cp support/linux-aarch64.config linux/build-aarch64/.config
 
 mkdir linux/build-riscv64/
 cp support/linux-riscv64.config linux/build-riscv64/.config
+
+cd linux
 ```
 
 Build:
 ``` sh
-make -C linux ARCH=arm64 O=build-aarch64 CROSS_COMPILE=aarch64-none-linux-gnu- -j16 Image
+make ARCH=arm64 O=build-aarch64 CROSS_COMPILE=`realpath ../buildroot/build-aarch64/host/bin/aarch64-buildroot-linux-gnu-` -j16 Image
 OR
-make -C linux ARCH=riscv O=build-riscv64 CROSS_COMPILE=riscv64-unknown-linux-gnu- -j16 Image
+make ARCH=riscv O=build-riscv64 CROSS_COMPILE=`realpath ../buildroot/build-riscv64/host/bin/riscv64-buildroot-linux-gnu-` -j16 Image
+
+cd ..
 ```
 
 ### Bind Linux Image and device tree
@@ -365,6 +380,7 @@ OR
 dtc -I dts -O dtb riscv64-ws/riscv64-dt1.dts > riscv64-ws/riscv64-dt1.dtb
 dtc -I dts -O dtb riscv64-ws/riscv64-dt2.dts > riscv64-ws/riscv64-dt2.dtb
 ```
+
 #### Arm
 ```sh
 cd lloader
@@ -410,7 +426,7 @@ make \
 cd ..
 ```
 
-## QEMU Setup
+## Step 7: QEMU Setup
 We need to add a second physical UART so we need to build our own qemu (we've tested v7.2.0):
 ``` sh
 git clone https://github.com/qemu/qemu
@@ -422,11 +438,11 @@ git apply ../support/0001-hw-arm-virt-Add-second-uart.patch
 make -j`nproc`
 
 ## do this if you want to install this qemu in your system, otherwise use the compile binary directly e.g., build/aarch64-softmmu/qemu-system-aarch64 OR build/riscv64-softmmu/qemu-system-riscv64
-[ sudo make install ]
+# sudo make install
 cd ..
 ```
 
-## Run the Demos
+## Step 8: Run the Demos
 
 Change to the aarch64-ws or riscv64-ws:
 ```
@@ -436,28 +452,24 @@ cd riscv64-ws
 ```
 
 ### Simple Demo
-This demo will instantiate a Linux VM and an OP-TEE VM
+This demo instantiates a Linux VM and an OP-TEE VM
 ``` sh
-./run-demo.sh
-OR
 ./run-demo.sh
 ```
 
-After Linux finishes booting you may initialize the tee-supplicant and run xtest as follows:
+After Linux finishes booting run xtest as follows:
 ``` sh
-tee-supplicant &
 xtest -t regression
 ```
 
 ### Demo 1
-This demo will instantiate two Linux VMs each with an OP-TEE VM, run:
+This demo instantiates two Linux VMs each with an OP-TEE VM, run:
 ``` sh
-./run-demo1.sh
-OR
 ./run-demo1.sh
 ```
 
-Our Qemu features two UARTs. Qemu on start up will inform us of the location of the second UART (e.g., /dev/pts/tty3):
+Our Qemu features two UARTs. Qemu on start up will inform us of the location of
+the second UART (e.g., /dev/pts/tty3):
 ```
 char device redirected to /dev/pts/3 (label serial1)
 
@@ -479,29 +491,35 @@ Platform Timer Device     : aclint-mtimer @ 10000000Hz
 
 ```
 
+To connect to the second uart you may use screen on another terminal instance
+. For example:
+```
+screen /dev/pts/3
+```
 
-Again on each Linux, you may initialize the tee-supplicant and run xtest as follows:
+Again on each Linux, you may run xtest as follows:
 ``` sh
-tee-supplicant &
 xtest -t regression
 ```
 
 ### Demo 2
-This demo will instantiate a Linux VM and two OP-TEE VMs
+This demo instantiates a Linux VM and two OP-TEE VMs.
 ``` sh
-./run-aarch64-qemu-demo2.sh
-OR
-./run-riscv64-qemu-demo2.sh
+./run-demo2.sh
 ```
 
-After Linux finishes booting you may initialize the two tee-supplicants. This setup only correctly configures the system to execute xtest in one OP-TEE VM, however you can execute TAs in the second OP-TEE
+After Linux finishes booting you may execute xtest in both OP-TEE VMs.
 ``` sh
-tee-supplicant &
-tee-supplicant2 &
-
 xtest -t regression
 xtest2 -t regression
 ```
+
+### Demo 3
+This demo showcases a Linux VM and two OP-TEE VMs, where the OP-TEEs are
+vulnerable, and might try to compromise the Linux VM or the other OP-TEE
+instance.
+
+
 
 ## License
 

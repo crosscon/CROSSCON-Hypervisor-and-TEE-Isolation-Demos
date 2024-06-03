@@ -1,0 +1,24 @@
+#! /bin/sh
+#
+# Preserve the random seed between reboots. See urandom(4).
+#
+
+# Quietly do nothing if /dev/urandom does not exist
+[ -c /dev/teepriv0 ] || exit 0
+
+
+case "$1" in
+        start)
+                # Carry a random seed from start-up to start-up
+                # Load and then save the whole entropy pool
+                tee-supplicant &;;
+        stop)
+                # Carry a random seed from shut-down to start-up
+                # Save the whole entropy pool
+                killall tee-supplicant &;;
+        *)
+                echo "Usage: $0 {start|stop}"
+                exit 1
+esac
+
+

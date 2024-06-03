@@ -3,12 +3,12 @@
 VM_IMAGE(linux_img, "../lloader/linux-riscv64.bin");
 struct vm_config linux = {
     .image = {
-        .base_addr = 0x81600000,
+        .base_addr = 0x91600000,
         .load_addr = VM_IMAGE_OFFSET(linux_img),
         .size = VM_IMAGE_SIZE(linux_img)
     },
 
-    .entry = 0x81600000,
+    .entry = 0x91600000,
     .cpu_affinity = 0x1,
 
     .type = 0,
@@ -19,8 +19,11 @@ struct vm_config linux = {
         .region_num = 2,
         .regions =  (struct mem_region[]) {
 	    {
-		.base = 0x81200000,
-		.size = 0x07d00000
+		.base = 0x91200000,
+		.size = 0x07d00000,
+                .place_phys = true,
+                .phys = 0x91200000
+
 	    },
 	    /* { */
 		/* /1* HOLE FOR IPC *1/ */
@@ -28,15 +31,17 @@ struct vm_config linux = {
                 /* .size = 0x00200000, */
 	    /* }, */
 	    {
-		.base = 0x89100000,
-		.size = 0x16f00000
+		.base = 0x99100000,
+		.size = 0x16f00000,
+                .place_phys = true,
+                .phys = 0x99100000
 	    },
         },
 
         .ipc_num = 1,
         .ipcs = (struct ipc[]) {
             {
-                .base = 0x88f00000,
+                .base = 0x98f00000,
                 .size = 0x00200000,
                 .shmem_id = 0,
             }
@@ -64,12 +69,12 @@ struct vm_config linux = {
 VM_IMAGE(optee_img, "../optee_os/optee-riscv/core/tee.bin");
 struct vm_config optee = {
     .image = {
-        .base_addr = 0x80200000,
+        .base_addr = 0xb0000000,
         .load_addr = VM_IMAGE_OFFSET(optee_img),
         .size = VM_IMAGE_SIZE(optee_img)
     },
 
-    .entry = 0x80200000,
+    .entry = 0xb0000000,
     .cpu_affinity = 0x1,
 
     .type = 1,
@@ -84,8 +89,10 @@ struct vm_config optee = {
         .regions =  (struct mem_region[]) {
 
 	    {
-		.base = 0x80200000,
-		.size = 0x00f00000
+		.base = 0xb0000000,
+		.size = 0x00f00000,
+                .place_phys = true,
+                .phys = 0xa0000000
 	    },
 
         },
@@ -93,7 +100,7 @@ struct vm_config optee = {
         .ipc_num = 1,
         .ipcs = (struct ipc[]) {
             {
-                .base = 0x88f00000,
+                .base = 0x98f00000,
                 .size = 0x00200000,
                 .shmem_id = 0,
             }
@@ -119,12 +126,12 @@ struct vm_config optee = {
 VM_IMAGE(linux2_img, "../lloader/linux2-riscv64.bin");
 struct vm_config linux2 = {
     .image = {
-        .base_addr = 0x81600000,
+        .base_addr = 0x91600000,
         .load_addr = VM_IMAGE_OFFSET(linux2_img),
         .size = VM_IMAGE_SIZE(linux2_img)
     },
 
-    .entry = 0x81600000,
+    .entry = 0x91600000,
 
     .cpu_affinity = 0x2,
 
@@ -136,7 +143,7 @@ struct vm_config linux2 = {
         .region_num = 2,
         .regions =  (struct mem_region[]) {
 	    {
-		.base = 0x81200000,
+		.base = 0x91200000,
 		.size = 0x07d00000
 	    },
 	    /* { */
@@ -145,7 +152,7 @@ struct vm_config linux2 = {
                 /* .size = 0x00200000, */
 	    /* }, */
 	    {
-		.base = 0x89100000,
+		.base = 0x99100000,
 		.size = 0x16f00000
 	    },
         },
@@ -153,7 +160,7 @@ struct vm_config linux2 = {
         .ipc_num = 1,
         .ipcs = (struct ipc[]) {
             {
-                .base = 0x88f00000,
+                .base = 0x98f00000,
                 .size = 0x00200000,
                 .shmem_id = 1,
             }
@@ -211,7 +218,7 @@ struct vm_config optee2 = {
         .ipc_num = 1,
         .ipcs = (struct ipc[]) {
             {
-                .base = 0x88f00000,
+                .base = 0x98f00000,
                 .size = 0x00200000,
                 .shmem_id = 1,
             }
