@@ -344,7 +344,65 @@ cd bitcoin-wallet
 ```
 
 ### Arm
-WIP
+```
+BUILDROOT=`pwd`/../buildroot/build-aarch64/
+
+export CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export ARCH=aarch64
+export PLATFORM=plat-virt
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee/export-ta_arm64
+export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
+export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=n
+export DESTDIR=./to_buildroot-aarch64
+export DEBUG=0
+export CFG_TEE_TA_LOG_LEVEL=0
+export O=`pwd`/out-aarch64
+
+
+rm -rf out-aarch64/
+## make sure we have things setup for first OP-TEE
+find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+make clean
+make -j`nproc`
+
+mkdir -p to_buildroot-aarch64/lib/optee_armtz
+mkdir -p to_buildroot-aarch64/bin
+
+cp out-aarch64/*.ta to_buildroot-aarch64/lib/optee_armtz
+cp host/wallet to_buildroot-aarch64/bin/bitcoin_wallet_ca
+chmod +x to_buildroot-aarch64/bin/bitcoin_wallet_ca
+
+
+
+## setup second OP-TEE
+export O=`pwd`/out2-aarch64
+export DESTDIR=./to_buildroot-aarch64-2
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2/export-ta_arm64
+export TEEC_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
+rm -rf `pwd`/out2-aarch64
+find . -name "Makefile" -exec sed -i "s/\-lteec/\-lteec2/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee_armtz/optee2_armtz/g" {} +
+make clean
+make -j`nproc`
+## undo changes
+find . -name "Makefile" -exec sed -i "s/\-lteec2/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+
+mkdir -p to_buildroot-aarch64-2/lib/optee2_armtz
+mkdir -p to_buildroot-aarch64-2/bin
+
+cp out-aarch64/*.ta to_buildroot-aarch64-2/lib/optee2_armtz
+cp host/wallet to_buildroot-aarch64-2/bin/bitcoin_wallet_ca2
+chmod +x to_buildroot-aarch64-2/bin/bitcoin_wallet_ca2
+
+
+cd ..
+```
 
 ### RISC-V
 ```
@@ -414,7 +472,65 @@ cd malicous_ta
 ```
 
 ### Arm
-WIP
+```
+BUILDROOT=`pwd`/../buildroot/build-aarch64/
+
+export CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export ARCH=aarch64
+export PLATFORM=plat-virt
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee/export-ta_arm64
+export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
+export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=n
+export DESTDIR=./to_buildroot-aarch64
+export DEBUG=0
+export CFG_TEE_TA_LOG_LEVEL=2
+export O=`pwd`/out-aarch64
+export aarch64_TARGET=y 
+
+
+rm -rf out-aarch64/
+## make sure we have things setup for first OP-TEE
+find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+make clean
+make -j`nproc`
+
+mkdir -p to_buildroot-aarch64/lib/optee_armtz
+mkdir -p to_buildroot-aarch64/bin
+
+cp out-aarch64/*.ta to_buildroot-aarch64/lib/optee_armtz
+cp host/malicious_ca to_buildroot-aarch64/bin/malicious_ca
+chmod +x to_buildroot-aarch64/bin/malicious_ca
+
+
+## setup second OP-TEE
+export O=`pwd`/out2-aarch64
+export DESTDIR=./to_buildroot-aarch64-2
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2/export-ta_arm64
+export TEEC_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
+rm -rf `pwd`/out2-aarch64
+find . -name "Makefile" -exec sed -i "s/\-lteec/\-lteec2/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee_armtz/optee2_armtz/g" {} +
+make clean
+make -j`nproc`
+## undo changes
+find . -name "Makefile" -exec sed -i "s/\-lteec2/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+
+mkdir -p to_buildroot-aarch64-2/lib/optee2_armtz
+mkdir -p to_buildroot-aarch64-2/bin
+
+cp out2-aarch64/*.ta to_buildroot-aarch64-2/lib/optee2_armtz
+cp host/malicious_ca to_buildroot-aarch64-2/bin/malicious_ca2
+chmod +x to_buildroot-aarch64-2/bin/malicious_ca2
+
+
+cd..
+```
 
 ### RISC-V
 ```
@@ -656,6 +772,72 @@ xtest2 -t regression
 This demo showcases a Linux VM and two OP-TEE VMs, where the OP-TEEs are
 vulnerable, and might try to compromise the Linux VM or the other OP-TEE
 instance.
+
+#### Build Vulnerable OP-TEE
+
+``` sh
+cd optee_os
+git fetch --all
+git checkout vulnerable
+```
+##### Build for aarch64
+WIP
+
+##### Build for RISCV
+``` sh
+export O="$OPTEE_DIR/optee-riscv"
+
+SHMEM_START="0x98f00000"
+SHMEM_SIZE="0x00200000"
+TDDRAM_START="0xb0000000"
+TDDRAM_SIZE="0x00f00000"
+
+rm -rf $O
+
+make \
+    ARCH=riscv \
+    PLATFORM=virt \
+    CROSS_COMPILE64=riscv64-unknown-linux-gnu- \
+    CROSS_COMPILE32=riscv32-unknown-linux-gnu- \
+    CFG_TDDRAM_SIZE=$TDDRAM_SIZE \
+    CFG_TDDRAM_START=$TDDRAM_START \
+    CFG_PKCS11_TA=n \
+    CFG_SHMEM_START=$SHMEM_START \
+    CFG_SHMEM_SIZE=$SHMEM_SIZE \
+    DEBUG=1 \
+    CFG_TEE_CORE_LOG_LEVEL=2 \
+    CFG_TEE_TA_LOG_LEVEL=2 \
+    CFG_VULN_PTA=y \
+    CFLAGS="-Og -DTARGET_RISCV" \
+    -j16
+
+export O="$OPTEE_DIR/optee2-riscv"
+TDDRAM_START="0xb2000000"
+SHMEM_START="0x99100000"
+
+rm -rf $O
+
+make \
+    ARCH=riscv \
+    PLATFORM=virt \
+    CROSS_COMPILE64=riscv64-unknown-linux-gnu- \
+    CROSS_COMPILE32=riscv32-unknown-linux-gnu- \
+    CFG_TDDRAM_SIZE=$TDDRAM_SIZE \
+    CFG_TDDRAM_START=$TDDRAM_START \
+    CFG_PKCS11_TA=n \
+    CFG_SHMEM_START=$SHMEM_START \
+    CFG_SHMEM_SIZE=$SHMEM_SIZE \
+    DEBUG=1 \
+    CFG_TEE_CORE_LOG_LEVEL=2 \
+    CFG_TEE_TA_LOG_LEVEL=2 \
+    CFLAGS="-Og -DOPTEE2 -DTARGET_RISCV" \
+    -j16
+
+cd ..
+```
+
+#### Execute the demo
+We reutilize the setup from Demo 2, so run:
 
 ``` sh
 ./run-demo2.sh
