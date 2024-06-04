@@ -338,7 +338,146 @@ mv $DESTDIR/bin/xtest $DESTDIR/bin/xtest2
 cd ..
 ```
 
-## Step 5: Finalize Linux file system
+## Step 6: Compile Bitcoin Wallet Client and Trusted Application
+```
+cd bitcoin-wallet
+```
+
+### Arm
+WIP
+
+### RISC-V
+```
+
+BUILDROOT=`pwd`/../buildroot/build-riscv64/
+
+export CROSS_COMPILE=$BUILDROOT/host/bin/riscv64-linux-
+export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/riscv64-linux-
+export TA_CROSS_COMPILE=$BUILDROOT/host/bin/riscv64-linux-
+export ARCH=riscv
+export PLATFORM=plat-virt
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-riscv/export-ta_rv64
+export TEEC_EXPORT=`pwd`/../optee_client/out-riscv64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-riscv64/export/usr/
+export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=n
+export DESTDIR=./to_buildroot-riscv
+export DEBUG=0
+export CFG_TEE_TA_LOG_LEVEL=0
+export O=`pwd`/out-riscv
+export RISCV_TARGET=y 
+
+
+rm -rf out-riscv/
+## make sure we have things setup for first OP-TEE
+find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+make clean
+make -j`nproc`
+
+mkdir -p to_buildroot-riscv64/lib/optee_armtz
+mkdir -p to_buildroot-riscv64/bin
+
+cp out-riscv/*.ta to_buildroot-riscv64/lib/optee_armtz
+cp host/wallet to_buildroot-riscv64/bin/bitcoin_wallet_ca
+chmod +x to_buildroot-riscv64/bin/bitcoin_wallet_ca
+
+
+## setup second OP-TEE
+export O=`pwd`/out2-riscv64
+export DESTDIR=./to_buildroot-riscv-2
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2-riscv/export-ta_rv64
+export TEEC_EXPORT=`pwd`/../optee_client/out2-riscv64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-riscv64/export/usr/
+rm -rf `pwd`/out2-riscv64
+find . -name "Makefile" -exec sed -i "s/\-lteec/\-lteec2/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee_armtz/optee2_armtz/g" {} +
+make clean
+make -j`nproc`
+## undo changes
+find . -name "Makefile" -exec sed -i "s/\-lteec2/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+
+mkdir -p to_buildroot-riscv64-2/lib/optee2_armtz
+mkdir -p to_buildroot-riscv64-2/bin
+
+cp out-riscv/*.ta to_buildroot-riscv64-2/lib/optee2_armtz
+cp host/wallet to_buildroot-riscv64-2/bin/bitcoin_wallet_ca2
+chmod +x to_buildroot-riscv64-2/bin/bitcoin_wallet_ca2
+
+cd ..
+```
+
+
+## Step 7: Compile Malicious Client and Trusted Application
+```
+cd malicous_ta
+```
+
+### Arm
+WIP
+
+### RISC-V
+```
+BUILDROOT=`pwd`/../buildroot/build-riscv64/
+
+export CROSS_COMPILE=$BUILDROOT/host/bin/riscv64-linux-
+export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/riscv64-linux-
+export TA_CROSS_COMPILE=$BUILDROOT/host/bin/riscv64-linux-
+export ARCH=riscv
+export PLATFORM=plat-virt
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-riscv/export-ta_rv64
+export TEEC_EXPORT=`pwd`/../optee_client/out-riscv64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-riscv64/export/usr/
+export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=n
+export DESTDIR=./to_buildroot-riscv64
+export DEBUG=0
+export CFG_TEE_TA_LOG_LEVEL=2
+export O=`pwd`/out-riscv64
+export RISCV_TARGET=y 
+
+
+rm -rf out-riscv64/
+## make sure we have things setup for first OP-TEE
+find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+make clean
+make -j`nproc`
+
+mkdir -p to_buildroot-riscv64/lib/optee_armtz
+mkdir -p to_buildroot-riscv64/bin
+
+cp out-riscv64/*.ta to_buildroot-riscv64/lib/optee_armtz
+cp host/malicious_ca to_buildroot-riscv64/bin/malicious_ca
+chmod +x to_buildroot-riscv64/bin/malicious_ca
+
+
+## setup for second OP-TEE
+export O=`pwd`/out2-riscv64
+export DESTDIR=./to_buildroot-riscv-2
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2-riscv/export-ta_rv64
+export TEEC_EXPORT=`pwd`/../optee_client/out2-riscv64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-riscv64/export/usr/
+rm -rf `pwd`/out2-riscv64
+find . -name "Makefile" -exec sed -i "s/\-lteec/\-lteec2/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee_armtz/optee2_armtz/g" {} +
+make clean
+make -j`nproc`
+## undo changes
+find . -name "Makefile" -exec sed -i "s/\-lteec2/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+
+mkdir -p to_buildroot-riscv64-2/lib/optee2_armtz
+mkdir -p to_buildroot-riscv64-2/bin
+
+cp out2-riscv64/*.ta to_buildroot-riscv64-2/lib/optee2_armtz
+cp host/malicious_ca to_buildroot-riscv64-2/bin/malicious_ca2
+chmod +x to_buildroot-riscv64-2/bin/malicious_ca2
+
+cd ..
+```
+
+
+## Step 8: Finalize Linux file system
 We have everything setup now, so build the final file system for Linux.
 ```sh
 cd buildroot
@@ -348,7 +487,7 @@ OR
 make O=build-riscv64/ -j`nproc`
 ```
 
-## Step 6: Build Linux
+## Step 9: Build Linux
 
 Set our predefined `.config` files:
 ``` sh
@@ -403,6 +542,7 @@ make \
 
 cd ..
 ```
+
 #### RISC-V
 ```sh
 cd lloader
@@ -426,23 +566,21 @@ make \
 cd ..
 ```
 
-## Step 7: QEMU Setup
+## Step 10: QEMU Setup
 We need to add a second physical UART so we need to build our own qemu (we've tested v7.2.0):
 ``` sh
 git clone https://github.com/qemu/qemu
 cd qemu
 git checkout v7.2.0
-./configure --target-list="riscv64-softmmu aarch64-softmmu"  
+./configure --target-list="riscv64-softmmu aarch64-softmmu"
 git apply ../support/0001-hw-riscv-virt-Add-second-uart.patch
 git apply ../support/0001-hw-arm-virt-Add-second-uart.patch
 make -j`nproc`
 
-## do this if you want to install this qemu in your system, otherwise use the compile binary directly e.g., build/aarch64-softmmu/qemu-system-aarch64 OR build/riscv64-softmmu/qemu-system-riscv64
-# sudo make install
 cd ..
 ```
 
-## Step 8: Run the Demos
+## Step 11: Run the Demos
 
 Change to the aarch64-ws or riscv64-ws:
 ```
@@ -519,7 +657,40 @@ This demo showcases a Linux VM and two OP-TEE VMs, where the OP-TEEs are
 vulnerable, and might try to compromise the Linux VM or the other OP-TEE
 instance.
 
+``` sh
+./run-demo2.sh
+```
 
+Login with root, and run the following commands to validate that the OP-TEE
+instances can try to attack linux, and the other OP-TEE instance but fail to do
+so.
+
+Validate that both OP-TEE instances execute, by creating a new bitcoin wallet master key.
+``` sh
+bitcoin_wallet_ca 2 1234
+bitcoin_wallet_ca2 2 1234
+```
+
+Use the malicious TA to compromise OP-TEE and attack Linux.
+```
+malicious_ca 1
+```
+
+Or the other TEE.
+```
+malicious_ca 3
+```
+
+Validate that the first OP-TEE instance is not accessible after trying to
+access memory outside it's allowed range:
+```
+bitcoin_wallet_ca 2 1234
+```
+
+Validate that the second OP-TEE instance remains operable:
+```
+bitcoin_wallet_ca2 2 1234
+```
 
 ## License
 

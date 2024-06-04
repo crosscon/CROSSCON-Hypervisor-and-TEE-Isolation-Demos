@@ -16,3 +16,6 @@
 [submodule "optee_test"]
 	path = optee_test
 	url = https://github.com/crosscon/optee_test.git
+[submodule "bitcoin-wallet"]
+	path = bitcoin-wallet
+	url = git@github.com:crosscon/bitcoin-wallet.git
