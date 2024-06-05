@@ -624,9 +624,9 @@ cd linux
 
 Build:
 ``` sh
-make ARCH=arm64 O=build-aarch64 CROSS_COMPILE=`realpath ../buildroot/build-aarch64/host/bin/aarch64-buildroot-linux-gnu-` -j16 Image
+make ARCH=arm64 O=build-aarch64 CROSS_COMPILE=`realpath ../buildroot/build-aarch64/host/bin/riscv64-linux-` -j16 Image
 OR
-make ARCH=riscv O=build-riscv64 CROSS_COMPILE=`realpath ../buildroot/build-riscv64/host/bin/riscv64-buildroot-linux-gnu-` -j16 Image
+make ARCH=riscv O=build-riscv64 CROSS_COMPILE=`realpath ../buildroot/build-riscv64/host/bin/riscv64-linux-` -j16 Image
 
 cd ..
 ```
