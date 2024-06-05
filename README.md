@@ -129,6 +129,7 @@ cd ..
 
 ### Build for RISCV
 ``` sh
+OPTEE_DIR="./"
 export O="$OPTEE_DIR/optee-riscv"
 
 SHMEM_START="0x98f00000"
@@ -201,6 +202,9 @@ cp support/br-aarch64.config buildroot/build-aarch64/.config
 cp support/br-riscv64.config buildroot/build-riscv64/.config
 ```
 
+This build step will fail as we haven't yet setup all the binaries necessary
+for the full filesystem. However, we take advantage of the fact that buildroot
+builds the linux toolchain to build these missing binaries.
 Build:
 ``` sh
 cd buildroot
@@ -601,6 +605,8 @@ cd buildroot
 make O=build-aarch64/ -j`nproc`
 OR
 make O=build-riscv64/ -j`nproc`
+
+cd ..
 ```
 
 ## Step 9: Build Linux
