@@ -44,7 +44,7 @@ popd
     -m 4G \
     -smp 2 \
     -bios fw_payload.elf \
-    -serial mon:stdio -serial pty \
+    -serial mon:stdio \
     -s \
     $@
 

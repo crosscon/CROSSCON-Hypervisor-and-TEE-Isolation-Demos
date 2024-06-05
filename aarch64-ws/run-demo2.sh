@@ -38,7 +38,7 @@ popd
     -m 4G \
     -bios bl1.bin \
     -semihosting-config enable,target=native \
-    -serial mon:stdio -serial pty \
+    -serial mon:stdio \
     -s \
     $@
 
