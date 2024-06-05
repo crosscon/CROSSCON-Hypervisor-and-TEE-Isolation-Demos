@@ -113,7 +113,7 @@ struct vm_config optee = {
 
 #include <config.h>
 // Linux Image
-VM_IMAGE(linux2_image, "../lloader/linux-aarch64.bin");
+VM_IMAGE(linux2_image, "../lloader/linux2-aarch64.bin");
 // Linux VM configuration
 struct vm_config linux2 = {
     .image = {
@@ -150,11 +150,11 @@ struct vm_config linux2 = {
                 .va = 0x9000000,
                 .size = 0x10000,
                 .interrupt_num = 1,
-                .interrupts = (irqid_t[]) {42}
+                .interrupts = (irqid_t[]) {0x2a}
             },
 	    {
 		.interrupt_num = 1,
-		.interrupts = (irqid_t[]) { 27 }
+		.interrupts = (irqid_t[]) { 0x1b }
 	    },
         },
         .arch = {
@@ -212,7 +212,7 @@ struct vm_config optee2 = {
             {
                 // Arch timer
                 .interrupt_num = 1,
-                .interrupts = (irqid_t[]) {27,40}
+                .interrupts = (irqid_t[]) {27}
             }
         },
         .arch = {

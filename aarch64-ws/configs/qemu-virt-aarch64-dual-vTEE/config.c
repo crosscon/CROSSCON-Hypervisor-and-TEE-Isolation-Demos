@@ -31,7 +31,7 @@ struct vm_config optee2_os = {
                 .shmem_id = 1,
             }
         },
-        .dev_num = 2,
+        .dev_num = 1,
         .devs = (struct dev_region[]) {
             {
                 // PL011
@@ -39,11 +39,6 @@ struct vm_config optee2_os = {
                 .pa = 0x9000000,
                 .size = 0x10000,
             },
-            {
-                // Arch timer
-                .interrupt_num = 1,
-                .interrupts = (irqid_t[]) {27}
-            }
         },
         .arch = {
             .gic = {
@@ -151,7 +146,7 @@ struct vm_config optee_os = {
                 .shmem_id = 0,
             }
         },
-        .dev_num = 2,
+        .dev_num = 1,
         .devs = (struct dev_region[]) {
             {
                 // PL011
@@ -159,11 +154,6 @@ struct vm_config optee_os = {
                 .pa = 0x9000000,
                 .size = 0x10000,
             },
-            {
-                // Arch timer
-                .interrupt_num = 1,
-                .interrupts = (irqid_t[]) {27,40}
-            }
         },
         .arch = {
             .gic = {
