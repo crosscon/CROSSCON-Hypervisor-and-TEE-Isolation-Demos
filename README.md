@@ -39,6 +39,20 @@ Before you jump to Demos you need to install each Tool in the following list:
 #### How to experiment CROSSCON Hypervisor Per-VM TEE feature?
 This experiment will use OP-TEE as trusted OS and will be carry out in qemu.
 
+## Setup
+Clone the repository:
+``` sh
+git clone git@github.com:crosscon/CROSSCON-Hypervisor-and-TEE-Isolation-Demos.git
+```
+
+If you're updating this repository, new components might have been added. Use
+the following commands to update an existing repository.
+``` sh
+git pull
+git submodule init
+git submodule update
+```
+
 ## Step 1: Build OP-TEE-OS
 
 ``` sh
@@ -624,7 +638,7 @@ cd linux
 
 Build:
 ``` sh
-make ARCH=arm64 O=build-aarch64 CROSS_COMPILE=`realpath ../buildroot/build-aarch64/host/bin/riscv64-linux-` -j16 Image
+make ARCH=arm64 O=build-aarch64 CROSS_COMPILE=`realpath ../buildroot/build-aarch64/host/bin/aarch64-linux-` -j16 Image
 OR
 make ARCH=riscv O=build-riscv64 CROSS_COMPILE=`realpath ../buildroot/build-riscv64/host/bin/riscv64-linux-` -j16 Image
 
