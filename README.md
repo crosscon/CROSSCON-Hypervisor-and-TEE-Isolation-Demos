@@ -126,6 +126,7 @@ make -C $OPTEE_DIR \
 
 cd ..
 ```
+
 ### Build for RISCV
 ``` sh
 export O="$OPTEE_DIR/optee-riscv"
@@ -150,7 +151,6 @@ make \
     DEBUG=1 \
     CFG_TEE_CORE_LOG_LEVEL=2 \
     CFG_TEE_TA_LOG_LEVEL=2 \
-    CFG_VULN_PTA=y \
     CFLAGS="-Og -DTARGET_RISCV" \
     -j16
 
@@ -781,7 +781,89 @@ git fetch --all
 git checkout vulnerable
 ```
 ##### Build for aarch64
-WIP
+``` sh
+OPTEE_DIR="./"
+export O="$OPTEE_DIR/optee"
+CC="aarch64-none-elf-"
+export CFLAGS=-Wno-cast-function-type
+PLATFORM="vexpress"
+PLATFORM_FLAVOR="qemu_armv8a"
+ARCH="arm"
+SHMEM_START="0x70000000"
+SHMEM_SIZE="0x00200000"
+TZDRAM_START="0x10100000"
+TZDRAM_SIZE="0x00F00000"
+CFG_GIC=n
+
+rm -rf $O
+
+make -C $OPTEE_DIR \
+    O="$OPTEE_DIR/optee" \
+    CROSS_COMPILE=$CC \
+    PLATFORM=$PLATFORM \
+    PLATFORM_FLAVOR=$PLATFORM_FLAVOR \
+    ARCH=$ARCH \
+    CFG_PKCS11_TA=n \
+    CFG_SHMEM_START=$SHMEM_START \
+    CFG_SHMEM_SIZE=$SHMEM_SIZE \
+    CFG_CORE_DYN_SHM=n \
+    CFG_CORE_RESERVED_SHM=y \
+    CFG_CORE_ASYNC_NOTIF=n \
+    CFG_TZDRAM_SIZE=$TZDRAM_SIZE \
+    CFG_TZDRAM_START=$TZDRAM_START \
+    CFG_GIC=y \
+    CFG_ARM_GICV2=y \
+    CFG_CORE_IRQ_IS_NATIVE_INTR=n \
+    CFG_ARM64_core=y \
+    CFG_USER_TA_TARGETS=ta_arm64 \
+    CFG_DT=n \
+    CFG_CORE_ASLR=n \
+    CFG_TEE_CORE_LOG_LEVEL=0 \
+    CFG_CORE_WORKAROUND_SPECTRE_BP=n \
+    CFG_CORE_WORKAROUND_NSITR_CACHE_PRIME=n \
+    CFG_VULN_PTA=y \
+    CFG_TEE_CORE_LOG_LEVEL=1 \
+    DEBUG=1 -j16
+
+
+OPTEE_DIR="./"
+export O="$OPTEE_DIR/optee2"
+SHMEM_START="0x70200000"
+TZDRAM_START="0x20100000"
+
+rm -rf $O
+
+make -C $OPTEE_DIR \
+    O="$OPTEE_DIR/optee2" \
+    CROSS_COMPILE=$CC \
+    PLATFORM=$PLATFORM \
+    PLATFORM_FLAVOR=$PLATFORM_FLAVOR \
+    ARCH=$ARCH \
+    CFG_PKCS11_TA=n \
+    CFG_SHMEM_START=$SHMEM_START \
+    CFG_SHMEM_SIZE=$SHMEM_SIZE \
+    CFG_CORE_DYN_SHM=n \
+    CFG_CORE_RESERVED_SHM=y \
+    CFG_CORE_ASYNC_NOTIF=n \
+    CFG_TZDRAM_SIZE=$TZDRAM_SIZE \
+    CFG_TZDRAM_START=$TZDRAM_START \
+    CFG_GIC=y \
+    CFG_ARM_GICV2=y \
+    CFG_CORE_IRQ_IS_NATIVE_INTR=n \
+    CFG_ARM64_core=y \
+    CFG_USER_TA_TARGETS=ta_arm64 \
+    CFG_DT=n \
+    CFG_CORE_ASLR=n \
+    CFG_CORE_WORKAROUND_SPECTRE_BP=n \
+    CFG_CORE_WORKAROUND_NSITR_CACHE_PRIME=n \
+    CFLAGS="${CFLAGS} -DOPTEE2" \
+    CFG_EARLY_TA=y \
+    CFG_VULN_PTA=y \
+    CFG_TEE_CORE_LOG_LEVEL=1 \
+    DEBUG=1 -j16
+
+cd ..
+```
 
 ##### Build for RISCV
 ``` sh
@@ -830,6 +912,7 @@ make \
     DEBUG=1 \
     CFG_TEE_CORE_LOG_LEVEL=2 \
     CFG_TEE_TA_LOG_LEVEL=2 \
+    CFG_VULN_PTA=y \
     CFLAGS="-Og -DOPTEE2 -DTARGET_RISCV" \
     -j16
 
