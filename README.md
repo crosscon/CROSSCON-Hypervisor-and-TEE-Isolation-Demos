@@ -957,25 +957,39 @@ bitcoin_wallet_ca2 2 1234
 ```
 
 Use the malicious TA to compromise OP-TEE and attack Linux.
-```
+``` sh
 malicious_ca 1
 ```
 
 Or the other TEE.
-```
+``` sh
 malicious_ca 3
 ```
 
 Validate that the first OP-TEE instance is not accessible after trying to
 access memory outside it's allowed range:
-```
+``` sh
 bitcoin_wallet_ca 2 1234
 ```
 
 Validate that the second OP-TEE instance remains operable:
-```
+``` sh
 bitcoin_wallet_ca2 2 1234
 ```
+
+### Demo 4
+This demo showcases a Linux VM instantiating an SGX-like enclave on aarch64.
+
+``` sh
+./run-demo-enclave.sh
+```
+
+After logging in as root execute the following command to execute sgx-nbench
+(https://github.com/utds3lab/sgx-nbench).
+``` sh
+sgx-bench_app
+```
+
 
 ## License
 

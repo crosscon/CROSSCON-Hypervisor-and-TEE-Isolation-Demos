@@ -1,0 +1,10 @@
+sprintf(buffer,"**System used for compilation:\n");
+output_string(buffer);
+sprintf(buffer,"**Linux silver 5.18.19-051819-generic #202208211443 SMP PREEMPT_DYNAMIC Sun Aug \n");
+output_string(buffer);
+sprintf(buffer,"**C compiler: a\n");
+output_string(buffer);
+sprintf(buffer,"**libc: \n");
+output_string(buffer);
+sprintf(buffer,"**Date of compilation: seg 03 jul 2023 23:14:15 WEST\n");
+output_string(buffer);
