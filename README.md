@@ -728,7 +728,7 @@ cd riscv64-ws
 ### Simple Demo
 This demo instantiates a Linux VM and an OP-TEE VM
 ``` sh
-./run-demo.sh
+./run-demo-vtee.sh
 ```
 
 After Linux finishes booting run xtest as follows:
@@ -739,7 +739,7 @@ xtest -t regression
 ### Demo 1
 This demo instantiates two Linux VMs each with an OP-TEE VM, run:
 ``` sh
-./run-demo1.sh
+./run-demo-per-vm-vtee.sh
 ```
 
 Our Qemu features two UARTs. Qemu on start up will inform us of the location of
@@ -779,7 +779,7 @@ xtest -t regression
 ### Demo 2
 This demo instantiates a Linux VM and two OP-TEE VMs.
 ``` sh
-./run-demo2.sh
+./run-demo-dual-vtee.sh
 ```
 
 After Linux finishes booting you may execute xtest in both OP-TEE VMs.
@@ -943,7 +943,7 @@ cd ..
 We reutilize the setup from Demo 2, so run:
 
 ``` sh
-./run-demo2.sh
+./run-demo-dual-vtee.sh
 ```
 
 Login with root, and run the following commands to validate that the OP-TEE
