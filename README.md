@@ -38,6 +38,8 @@ Before you jump to Demos you need to install each Tool in the following list:
 
 #### How to experiment CROSSCON Hypervisor Per-VM TEE feature?
 This experiment will use OP-TEE as trusted OS and will be carry out in qemu.
+This guide provides steps for both aarch64 and RISC-V, please follow the
+corresponding steps for the chosen architecture.
 
 ## Setup
 Clone the repository:
@@ -796,7 +798,7 @@ instance.
 #### Build Vulnerable OP-TEE
 
 ``` sh
-cd optee_os
+cd ../optee_os
 git fetch --all
 git checkout vulnerable
 ```
@@ -882,11 +884,12 @@ make -C $OPTEE_DIR \
     CFG_TEE_CORE_LOG_LEVEL=1 \
     DEBUG=1 -j16
 
-cd ..
+cd -
 ```
 
 ##### Build for RISCV
 ``` sh
+OPTEE_DIR="./"
 export O="$OPTEE_DIR/optee-riscv"
 
 SHMEM_START="0x98f00000"
@@ -936,7 +939,7 @@ make \
     CFLAGS="-Og -DOPTEE2 -DTARGET_RISCV" \
     -j16
 
-cd ..
+cd -
 ```
 
 #### Execute the demo
@@ -956,13 +959,12 @@ bitcoin_wallet_ca 2 1234
 bitcoin_wallet_ca2 2 1234
 ```
 
-Use the malicious TA to compromise OP-TEE and attack Linux.
+Use the malicious TA to compromise OP-TEE and attack Linux or the other TEE.
 ``` sh
 malicious_ca 1
-```
 
-Or the other TEE.
-``` sh
+OR
+
 malicious_ca 3
 ```
 
