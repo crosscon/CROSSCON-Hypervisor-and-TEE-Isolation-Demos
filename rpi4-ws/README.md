@@ -113,7 +113,7 @@ cd $ROOT
 cd optee_os
 
 OPTEE_DIR="./"
-export O="$OPTEE_DIR/optee-rpi4"
+export O="$OPTEE_DIR/optee-aarch64"
 CC="aarch64-none-elf-"
 export CFLAGS=-Wno-cast-function-type
 PLATFORM="rpi4"
@@ -155,7 +155,7 @@ make -C $OPTEE_DIR \
 
 
 OPTEE_DIR="./"
-export O="$OPTEE_DIR/optee2-rpi4"
+export O="$OPTEE_DIR/optee2-aarch64"
 SHMEM_START="0x08200000"
 TZDRAM_START="0x20100000"
 
