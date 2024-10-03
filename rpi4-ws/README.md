@@ -5,7 +5,7 @@ build virtual TEEs.
 Start by setting the root folder path:
 
 ```sh
-export ROOT=`realpath ../$PWD`
+export ROOT=`realpath .`
 ```
 
 # Setup firmware compnents
@@ -93,9 +93,9 @@ Remove and insert the sd card to automatically mount it.
  copy the firmware and bao's final image to it:
 
 ```sh
-SDCARD=/media/$USER/boot
+export SDCARD=/media/$USER/boot
 
-cp -vr firmware/boot/start* $SDCARD
+cp -vr firmware/boot/* $SDCARD
 cp -v config.txt $SDCARD
 cp -v bin/bl31.bin $SDCARD
 cp -v bin/u-boot.bin $SDCARD
@@ -248,7 +248,7 @@ export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export ARCH=aarch64
 export PLATFORM=plat-vexpress
 export PLATFORM_FLAVOR=qemu_armv8a
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-aarch64/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=y
@@ -270,7 +270,7 @@ make install
 
 export O=`pwd`/out2-aarch64
 export DESTDIR=./to_buildroot-aarch64-2
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2-aarch64/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
 rm -rf `pwd`/out2-aarch64
@@ -297,7 +297,7 @@ export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export ARCH=aarch64
 export PLATFORM=plat-virt
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-aarch64/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=n
@@ -349,7 +349,70 @@ chmod +x to_buildroot-aarch64-2/bin/bitcoin_wallet_ca2
 cd $ROOT
 ```
 
-## Step 6: Finalize Linux file system
+## Step 6: Compile Malicious Client and Trusted Application
+```
+cd malicous_ta
+
+BUILDROOT=`pwd`/../buildroot/build-aarch64/
+
+export CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
+export ARCH=aarch64
+export PLATFORM=plat-virt
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-aarch64/export-ta_arm64
+export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
+export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=n
+export DESTDIR=./to_buildroot-aarch64
+export DEBUG=0
+export CFG_TEE_TA_LOG_LEVEL=2
+export O=`pwd`/out-aarch64
+export aarch64_TARGET=y 
+
+
+rm -rf out-aarch64/
+## make sure we have things setup for first OP-TEE
+find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+make clean
+make -j`nproc`
+
+mkdir -p to_buildroot-aarch64/lib/optee_armtz
+mkdir -p to_buildroot-aarch64/bin
+
+cp out-aarch64/*.ta to_buildroot-aarch64/lib/optee_armtz
+cp host/malicious_ca to_buildroot-aarch64/bin/malicious_ca
+chmod +x to_buildroot-aarch64/bin/malicious_ca
+
+
+## setup second OP-TEE
+export O=`pwd`/out2-aarch64
+export DESTDIR=./to_buildroot-aarch64-2
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2-aarch64/export-ta_arm64
+export TEEC_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
+export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
+rm -rf `pwd`/out2-aarch64
+find . -name "Makefile" -exec sed -i "s/\-lteec/\-lteec2/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee_armtz/optee2_armtz/g" {} +
+make clean
+make -j`nproc`
+## undo changes
+find . -name "Makefile" -exec sed -i "s/\-lteec2/\-lteec/g" {} +
+find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
+
+mkdir -p to_buildroot-aarch64-2/lib/optee2_armtz
+mkdir -p to_buildroot-aarch64-2/bin
+
+cp out2-aarch64/*.ta to_buildroot-aarch64-2/lib/optee2_armtz
+cp host/malicious_ca to_buildroot-aarch64-2/bin/malicious_ca2
+chmod +x to_buildroot-aarch64-2/bin/malicious_ca2
+
+
+cd $ROOT
+```
+
+## Step 7: Finalize Linux file system
 We have everything setup now, so build the final file system for Linux.
 ```sh
 cd buildroot
@@ -359,7 +422,8 @@ make O=build-aarch64/ -j`nproc`
 cd $ROOT
 ```
 
-## Step 7: Build Linux
+
+## Step 8: Build Linux
 
 Set our predefined `.config` files:
 ``` sh
@@ -376,7 +440,11 @@ cd $ROOT
 ### Bind Linux Image and device tree
 
 ```sh
-dtc -I dts -O dtb rpi4-ws/rpi4.dts > rpi4-ws/rpi4.dtb
+cd rpi4-ws
+
+dtc -I dts -O dtb rpi4.dts > rpi4.dtb
+
+cd $ROOT
 ```
 
 ```sh
@@ -398,7 +466,11 @@ cd $ROOT
 This demo instantiates a Linux VM and an OP-TEE VM.
 Insert the sdcard in your pc, and wait for it to mount the boot partition. The script expects it to be mount on `/media/$USER/boot`
 ``` sh
+cd rpi4-ws
+
 ./build-demo-vtee.sh
+
+cd $ROOT
 ```
 #### Setup board
 
@@ -430,7 +502,11 @@ xtest -t regression
 ### Demo 2
 This demo instantiates a Linux VM and two OP-TEE VMs.
 ``` sh
+cd rpi4-ws
+
 ./build-demo-dual-vtee.sh
+
+cd $ROOT
 ```
 
 After Linux finishes booting you may execute xtest in both OP-TEE VMs.

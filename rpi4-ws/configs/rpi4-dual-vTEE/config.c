@@ -1,6 +1,6 @@
 #include <config.h>
 
-VM_IMAGE(optee2_os_image, "../optee_os/optee2-rpi4/core/tee-pager_v2.bin");
+VM_IMAGE(optee2_os_image, "../optee_os/optee2-aarch64/core/tee-pager_v2.bin");
 
 struct vm_config optee2_os = {
     .image = {
@@ -51,7 +51,7 @@ struct vm_config optee2_os = {
 
 
 // Linux Image
-VM_IMAGE(linux_image, "../lloader/linux-rpi4-aarch64.bin");
+VM_IMAGE(linux_image, "../lloader/linux-rpi4.bin");
 
 // Linux VM configuration
 struct vm_config linux = {
@@ -140,7 +140,7 @@ struct vm_config linux = {
     }
 };
 
-VM_IMAGE(optee_os_image, "../optee_os/optee-rpi4/core/tee-pager_v2.bin");
+VM_IMAGE(optee_os_image, "../optee_os/optee-aarch64/core/tee-pager_v2.bin");
 
 
 struct vm_config optee_os = {
