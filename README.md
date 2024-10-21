@@ -26,7 +26,7 @@ Before you jump to Demos you need to install each Tool in the following list:
 | Tool                    | Version |
 | ----------------------- | ------- |
 | arm-none-eabi-gcc       | 11.3.1  |
-| aarch64-none-elf-gcc    | 11.2.1  |
+| aarch64-none-elf-gcc    | 11.1.1  |
 | riscv64-unknown-elf-gcc | 10.2.0  |
 | make                    | 4.2.1   |
 | dtc                     | 1.5.0   |
@@ -990,6 +990,31 @@ After logging in as root execute the following command to execute sgx-nbench
 (https://github.com/utds3lab/sgx-nbench).
 ``` sh
 sgx-bench_app
+```
+
+### Demo 5
+This demo instantiates a Linux VM a FreeRTOS VM, and Baremetal environment VM,
+and establishes IPC communication between the Linux and FreeRTOS VMs.
+Currently this demo only works for qemu-arch64-virt.
+
+``` sh
+./run-demo-multi.sh
+```
+
+Our Qemu features two UARTs. Qemu on start up will inform us of the location of
+the second UART (e.g., /dev/pts/tty3):
+While the CROSSCON Hypervisor outputs to the first UART, the Baremetal and
+FreeRTOS output to the second UART.
+
+After Linux finishes booting, you can communicate with FreeRTOS as follows:
+``` sh
+echo "hello" > /dev/crossconhypipc0
+```
+
+The second UART should output the following, among the periodic baremetal and
+FreeRTOS output:
+```
+[FreeRTOS] message from linux: hello
 ```
 
 

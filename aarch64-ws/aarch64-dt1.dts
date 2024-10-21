@@ -17,6 +17,15 @@
 		};
         };
 
+        crosscon-ipc@f0000000 {
+            compatible = "crossconhyp,ipcshmem";
+            reg = <0x0 0xf0000000 0x0 0x00010000>;
+            read-channel = <0x0 0x2000>;
+            write-channel = <0x2000 0x2000>;
+            interrupts = <0 0x14 1>;
+            id = <0>;
+        };
+
         enclave{
             compatible = "crossconEnclave";
             #address-cells = <2>;
