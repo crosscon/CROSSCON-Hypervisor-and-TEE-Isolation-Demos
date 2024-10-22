@@ -992,17 +992,6 @@ After logging in as root execute the following command to execute sgx-nbench
 enclave_app
 ```
 
-This demo also instantiates two OP-TEE VMs, similar to demo 2. Which can be
-used simultaneously with the enclave. For example:
-
-``` sh
-enclave_app &
-
-bitcoin_wallet_ca 2 1234
-
-bitcoin_wallet_ca2 2 1234
-```
-
 ### Demo 5
 This demo instantiates a Linux VM a FreeRTOS VM, and Baremetal environment VM,
 and establishes IPC communication between the Linux and FreeRTOS VMs.
