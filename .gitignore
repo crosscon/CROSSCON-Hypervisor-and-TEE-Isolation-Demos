@@ -51,3 +51,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+*.dtb
+*to_buildroot*
+*out*
+*build*
+*.S
