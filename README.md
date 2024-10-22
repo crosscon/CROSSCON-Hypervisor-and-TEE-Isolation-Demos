@@ -993,6 +993,35 @@ enclave_app
 ```
 
 ### Demo 5
+This demo showcases support for multiple programming models simultaneously,
+with each TEE being configured with specific access to memory and IO.
+Similarly to Demo 1, we leverage the second Qemu UART, which is attributed to a
+second Linux and corresponding OP-TEE instances.
+
+``` sh
+./run-demo-models.sh
+```
+
+After logging in as root execute the following command to execute sgx-nbench
+(https://github.com/utds3lab/sgx-nbench).
+``` sh
+enclave_app
+```
+
+You can also access TEE functionality, on either the first or second Linux
+instance. For example:
+
+``` sh
+bitcoin_wallet_ca 2 1234
+```
+
+In the first instance Linux has a second OP-TEE VM. You can access it by running, for example:
+
+``` sh
+bitcoin_wallet_ca2 2 1234
+```
+
+### Demo 6
 This demo instantiates a Linux VM a FreeRTOS VM, and Baremetal environment VM,
 and establishes IPC communication between the Linux and FreeRTOS VMs.
 Currently this demo only works for qemu-arch64-virt.
