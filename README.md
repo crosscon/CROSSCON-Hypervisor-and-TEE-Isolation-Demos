@@ -989,7 +989,18 @@ This demo showcases a Linux VM instantiating an SGX-like enclave on aarch64.
 After logging in as root execute the following command to execute sgx-nbench
 (https://github.com/utds3lab/sgx-nbench).
 ``` sh
-sgx-bench_app
+enclave_app
+```
+
+This demo also instantiates two OP-TEE VMs, similar to demo 2. Which can be
+used simultaneously with the enclave. For example:
+
+``` sh
+enclave_app &
+
+bitcoin_wallet_ca 2 1234
+
+bitcoin_wallet_ca2 2 1234
 ```
 
 ### Demo 5
