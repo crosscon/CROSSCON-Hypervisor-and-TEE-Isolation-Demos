@@ -213,7 +213,7 @@ cd optee_client
 git checkout master
 make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out-aarch64
 git checkout optee2
-make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out2-aarch64
+make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out2-aarch64 CFG_TEE_FS_PARENT_PATH=/data/tee2
 
 cd $ROOT
 ```
