@@ -82,7 +82,7 @@ struct vm_config linux = {
     }
 };
 
-VM_IMAGE(optee_os_image, "../optee_os/optee-aarch64/core/tee-pager_v2.bin");
+VM_IMAGE(optee_os_image, "../optee_os/optee-rpi4/core/tee-pager_v2.bin");
 
 
 struct vm_config optee_os = {

@@ -8,9 +8,13 @@ Start by setting the root folder path:
 export ROOT=`realpath .`
 ```
 
-# Setup firmware compnents
+# Setup firmware components
 
 Some fimware components need to downloaded and built. Follow these steps:
+
+```sh
+export ROOT=`pwd`
+```
 
 ```sh
 cd rpi4-ws
@@ -37,29 +41,36 @@ cd $RPI4_WS
 ---
 ## Prepare SDCard
 
-In this example the sdcard is `/dev/mmcblk0` and the partitions are `/dev/mmcblk0p1`, `/dev/mmcblk0p2`, etc. 
+In this example the sdcard is `/dev/sdb` and the partitions are `/dev/sdb1`, `/dev/sdb2`, etc.
 
-### i) Make sure all partitions are unmounted
+### i) Start by checking which SD card you have  
+```sh
+lsblk -o NAME,RM,SIZE,MODEL | grep 1
+```
+![SDcard](./img/.gif/SDcard.gif)
+
+### ii) Make sure all partitions are unmounted
 
 ```sh
-umount /dev/mmcblk0*
+umount /dev/<your SD card>*
 ```
-
-### ii) Delete all partitions
+![unmountSD](./img/.gif/unmountSD.gif)
+### iii) Delete all partitions
 
 ```sh
-sudo fdisk /dev/mmcblk0
+sudo fdisk /dev/<your SD card>
 ```
-
 Then run the commands:
 
 * Press `d` until there are no more partitions (if it asks you for the partition, press `return` for the default)
 * Press `w` write changes and exit
 
-### iii) Create partition
+![SDdelpart](./img/.gif/SDdelpart.gif)
+
+### iv) Create partition
 
 ```sh
-sudo fdisk /dev/mmcblk0
+sudo fdisk /dev/<your SD card>
 ```
 
 Then run the commands:
@@ -76,30 +87,32 @@ Then run the commands:
     * type `c` for W95 FAT32 (LBA)
 * `w` to write changes and exit
 
+![SDcreatepart](./img/.gif/SDcreatepart.gif)
 
-### iv) Format partition
-
+### v) Format partition
 Format the created partition to a fat filesystem:
-
 ```sh
-sudo mkfs.fat /dev/mmcblk0p1 -n boot
+sudo mkfs.fat /dev/<your SD card>1 -n boot
 ```
 
 Remove and insert the sd card to automatically mount it. 
 
----
+![SDformat](./img/.gif/SDformat.gif)
 
+---
 # Copy Firmware Files to SDCard
- copy the firmware and bao's final image to it:
+ copy the firmware and CROSSCON Hypervisor's final image to it:
 
 ```sh
-export SDCARD=/media/$USER/boot
+cd $RPI4_WS
+SDCARD=/media/$USER/boot
 
-cp -vr firmware/boot/* $SDCARD
+cp -vr firmware/boot/start* $SDCARD
 cp -v config.txt $SDCARD
 cp -v bin/bl31.bin $SDCARD
 cp -v bin/u-boot.bin $SDCARD
 ```
+![SDcopyfw](./img/.gif/SDcopyfw.gif)
 
 ---
 # Build Components
@@ -113,7 +126,7 @@ cd $ROOT
 cd optee_os
 
 OPTEE_DIR="./"
-export O="$OPTEE_DIR/optee-aarch64"
+export O="$OPTEE_DIR/optee-rpi4"
 CC="aarch64-none-elf-"
 export CFLAGS=-Wno-cast-function-type
 PLATFORM="rpi4"
@@ -155,7 +168,7 @@ make -C $OPTEE_DIR \
 
 
 OPTEE_DIR="./"
-export O="$OPTEE_DIR/optee2-aarch64"
+export O="$OPTEE_DIR/optee2-rpi4"
 SHMEM_START="0x08200000"
 TZDRAM_START="0x20100000"
 
@@ -190,8 +203,8 @@ make -C $OPTEE_DIR \
     DEBUG=1 -j16
 
 cd $ROOT
-
 ```
+![COMPoptee](./img/.gif/COMPoptee.gif)
 
 ## Step 2: Linux file system
 We will first build an incomplete filesystem to benefit fom buildroot building the appropriate linux toolchains.
@@ -222,6 +235,7 @@ make O=build-aarch64/ -j`nproc`
 
 cd $ROOT
 ```
+![COMPlinuxbefore](./img/.gif/COMPlinuxbefore.gif)
 
 ## Step 3: Build OP-TEE Clients
 Build the optee client application library and tee supplicant for both OP-TEEs.
@@ -231,11 +245,11 @@ cd optee_client
 git checkout master
 make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out-aarch64
 git checkout optee2
-make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out2-aarch64 CFG_TEE_FS_PARENT_PATH=/data/tee2
+make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out2-aarch64
 
 cd $ROOT
 ```
-
+![COMPopteeclient](./img/.gif/COMPopteeclient.gif)
 ## Step 4: Build OP-TEE xtest
 Build the OP-TEE xtest test suite.
 ``` sh
@@ -248,7 +262,7 @@ export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export ARCH=aarch64
 export PLATFORM=plat-vexpress
 export PLATFORM_FLAVOR=qemu_armv8a
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-aarch64/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=y
@@ -270,7 +284,7 @@ make install
 
 export O=`pwd`/out2-aarch64
 export DESTDIR=./to_buildroot-aarch64-2
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2-aarch64/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
 rm -rf `pwd`/out2-aarch64
@@ -285,6 +299,7 @@ find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
 mv $DESTDIR/bin/xtest $DESTDIR/bin/xtest2
 cd $ROOT
 ```
+![COMPxtest](./img/.gif/COMPxtest.gif)
 
 ## Step 5: Compile Bitcoin Wallet Client and Trusted Application
 ```sh
@@ -297,7 +312,7 @@ export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export ARCH=aarch64
 export PLATFORM=plat-virt
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-aarch64/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=n
@@ -305,7 +320,6 @@ export DESTDIR=./to_buildroot-aarch64
 export DEBUG=0
 export CFG_TEE_TA_LOG_LEVEL=0
 export O=`pwd`/out-aarch64
-
 
 rm -rf out-aarch64/
 ## make sure we have things setup for first OP-TEE
@@ -320,8 +334,6 @@ mkdir -p to_buildroot-aarch64/bin
 cp out-aarch64/*.ta to_buildroot-aarch64/lib/optee_armtz
 cp host/wallet to_buildroot-aarch64/bin/bitcoin_wallet_ca
 chmod +x to_buildroot-aarch64/bin/bitcoin_wallet_ca
-
-
 
 ## setup second OP-TEE
 export O=`pwd`/out2-aarch64
@@ -348,13 +360,12 @@ chmod +x to_buildroot-aarch64-2/bin/bitcoin_wallet_ca2
 
 cd $ROOT
 ```
+![COMPbw](./img/.gif/COMPbw.gif)
 
 ## Step 6: Compile Malicious Client and Trusted Application
 ```
 cd malicous_ta
-
 BUILDROOT=`pwd`/../buildroot/build-aarch64/
-
 export CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
@@ -369,23 +380,17 @@ export DEBUG=0
 export CFG_TEE_TA_LOG_LEVEL=2
 export O=`pwd`/out-aarch64
 export aarch64_TARGET=y 
-
-
 rm -rf out-aarch64/
 ## make sure we have things setup for first OP-TEE
 find . -name "Makefile" -exec sed -i "s/\-lteec2$/\-lteec/g" {} +
 find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
 make clean
 make -j`nproc`
-
 mkdir -p to_buildroot-aarch64/lib/optee_armtz
 mkdir -p to_buildroot-aarch64/bin
-
 cp out-aarch64/*.ta to_buildroot-aarch64/lib/optee_armtz
 cp host/malicious_ca to_buildroot-aarch64/bin/malicious_ca
 chmod +x to_buildroot-aarch64/bin/malicious_ca
-
-
 ## setup second OP-TEE
 export O=`pwd`/out2-aarch64
 export DESTDIR=./to_buildroot-aarch64-2
@@ -400,17 +405,14 @@ make -j`nproc`
 ## undo changes
 find . -name "Makefile" -exec sed -i "s/\-lteec2/\-lteec/g" {} +
 find . -name "Makefile" -exec sed -i "s/optee2_armtz/optee_armtz/g" {} +
-
 mkdir -p to_buildroot-aarch64-2/lib/optee2_armtz
 mkdir -p to_buildroot-aarch64-2/bin
-
 cp out2-aarch64/*.ta to_buildroot-aarch64-2/lib/optee2_armtz
 cp host/malicious_ca to_buildroot-aarch64-2/bin/malicious_ca2
 chmod +x to_buildroot-aarch64-2/bin/malicious_ca2
-
-
 cd $ROOT
 ```
+![COMPlinuxkernel](./img/.gif/COMPmalicious.gif)
 
 ## Step 7: Finalize Linux file system
 We have everything setup now, so build the final file system for Linux.
@@ -421,7 +423,7 @@ make O=build-aarch64/ -j`nproc`
 
 cd $ROOT
 ```
-
+![COMPlinuxfinal](./img/.gif/COMPlinuxfinal.gif)
 
 ## Step 8: Build Linux
 
@@ -437,14 +439,13 @@ make ARCH=arm64 O=build-aarch64 CROSS_COMPILE=`realpath ../buildroot/build-aarch
 cd $ROOT
 ```
 
-### Bind Linux Image and device tree
+![COMPlinuxkernel](./img/.gif/COMPlinuxkernel.gif)
+
+---
+### Step 9: Bind Linux Image and device tree
 
 ```sh
-cd rpi4-ws
-
-dtc -I dts -O dtb rpi4.dts > rpi4.dtb
-
-cd $ROOT
+dtc -I dts -O dtb rpi4-ws/rpi4.dts > rpi4-ws/rpi4.dtb
 ```
 
 ```sh
@@ -454,29 +455,36 @@ rm linux-rpi4.bin
 rm linux-rpi4.elf
 make  \
     IMAGE=../linux/build-aarch64/arch/arm64/boot/Image \
-    DTB=../rpi4-ws/rpi4.dtb \
+    DTB=../rpi4-ws/rpi4-dt1.dtb \
     TARGET=linux-rpi4.bin \
     CROSS_COMPILE=aarch64-none-elf- \
     ARCH=aarch64
 
 cd $ROOT
 ```
+![COMPdt](./img/.gif/COMPdt.gif)
+
 
 ### Simple Demo
 This demo instantiates a Linux VM and an OP-TEE VM.
 Insert the sdcard in your pc, and wait for it to mount the boot partition. The script expects it to be mount on `/media/$USER/boot`
 ``` sh
-cd rpi4-ws
-
 ./build-demo-vtee.sh
-
-cd $ROOT
 ```
+![RUNsimpledemo](./img/.gif/RUNsimpledemo.gif)
+
 #### Setup board
 
 Insert the sd card in the board's sd slot.
 
-Connect to the Raspberry Pi's UART using a USB-to-TTL adapter to connect to the Raspberry Pi's GPIO header UART pins. Use a terminal application such as  `miniterm.py` from pyserial package. For example:
+Connect to the Raspberry Pi's UART using a USB-to-TTL adapter to connect to the Raspberry Pi's GPIO header UART pins. 
+
+- VCC (Pin 4 on RPI4) → Connect to VCC on the USB-to-TTL adapter. This provides power to the adapter.
+- GND (Pin 6 on RPI4) → Connect to GND on the adapter to establish a common ground.
+- TX (Pin 8 on RPI4) → Connect to RX on the adapter. This allows the RPI4 to send data to the adapter’s receive line.
+- RX (Pin 10 on RPI4) → Connect to TX on the adapter, enabling data reception from the adapter’s transmit line.
+
+Use a terminal application such as  `miniterm.py` from pyserial package. For example:
 
 ```
 miniterm.py /dev/ttyUSB0 115200
@@ -502,11 +510,7 @@ xtest -t regression
 ### Demo 2
 This demo instantiates a Linux VM and two OP-TEE VMs.
 ``` sh
-cd rpi4-ws
-
 ./build-demo-dual-vtee.sh
-
-cd $ROOT
 ```
 
 After Linux finishes booting you may execute xtest in both OP-TEE VMs.
