@@ -107,7 +107,7 @@ Remove and insert the sd card to automatically mount it.
 cd $RPI4_WS
 SDCARD=/media/$USER/boot
 
-cp -vr firmware/boot/start* $SDCARD
+cp -vr firmware/boot/* $SDCARD
 cp -v config.txt $SDCARD
 cp -v bin/bl31.bin $SDCARD
 cp -v bin/u-boot.bin $SDCARD
@@ -455,7 +455,7 @@ rm linux-rpi4.bin
 rm linux-rpi4.elf
 make  \
     IMAGE=../linux/build-aarch64/arch/arm64/boot/Image \
-    DTB=../rpi4-ws/rpi4-dt1.dtb \
+    DTB=../rpi4-ws/rpi4.dtb \
     TARGET=linux-rpi4.bin \
     CROSS_COMPILE=aarch64-none-elf- \
     ARCH=aarch64
