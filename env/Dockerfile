@@ -30,7 +30,15 @@ RUN apt-get update && \
     bison \
     pkg-config \
     openssl \
-    libssl-dev
+    libssl-dev \
+    cpio \
+    unzip \
+    rsync \
+    bc \
+    device-tree-compiler \
+    gcc-aarch64-linux-gnu \
+    g++-aarch64-linux-gnu \
+    python3-pyelftools
 
 # Install Make 4.2.1
 RUN wget http://ftp.pl.debian.org/debian/pool/main/m/make-dfsg/make_4.2.1-1.2_amd64.deb \
@@ -108,13 +116,3 @@ RUN cd $WORKDIR_PATH/crosscon \
 
 # Fix missing "cryptography" python module
 RUN apt install python3-cryptography -y
-
-# necessary for optee_os and client
-RUN apt update && apt install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-RUN apt-get update && apt-get install -y python3-pyelftools
-
-# necessary for building buildroot
-RUN apt-get update && apt-get install -y cpio unzip rsync bc
-
-# device tree compiler, neccessary for step 8
-RUN apt-get update && apt-get install -y device-tree-compiler
