@@ -38,7 +38,10 @@ RUN apt-get update && \
     device-tree-compiler \
     gcc-aarch64-linux-gnu \
     g++-aarch64-linux-gnu \
-    python3-pyelftools
+    python3-pyelftools  \
+    gcc-riscv64-linux-gnu \
+    g++-riscv64-linux-gnu \
+    binutils-riscv64-linux-gnu
 
 # Install Make 4.2.1
 RUN wget http://ftp.pl.debian.org/debian/pool/main/m/make-dfsg/make_4.2.1-1.2_amd64.deb \
@@ -116,3 +119,6 @@ RUN cd $WORKDIR_PATH/crosscon \
 
 # Fix missing "cryptography" python module
 RUN apt install python3-cryptography -y
+
+# copy script for rpi4-ws demo
+COPY files/build.sh $WORKDIR_PATH/
