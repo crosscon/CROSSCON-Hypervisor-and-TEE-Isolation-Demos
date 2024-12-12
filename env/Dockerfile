@@ -102,12 +102,6 @@ RUN wget http://ftp.pl.debian.org/debian/pool/main/n/ninja-build/ninja-build_1.1
     && dpkg -i ninja-build_1.10.1-1_amd64.deb \
     && rm -f ninja-build_1.10.1-1_amd64.deb
 
-# Install Arm GNU toolchain
-RUN wget -O aarch64-none-elf.tar.xz "https://developer.arm.com/-/media/Files/downloads/gnu/11.2-2022.02/binrel/gcc-arm-11.2-2022.02-x86_64-aarch64-none-elf.tar.xz?rev=981d8f7e91864070a466d852589598e2&hash=8D5397D4E41C99A96989ED813E8E95F0" \
-    && unxz aarch64-none-elf.tar.xz \
-    && tar -xvf aarch64-none-elf.tar \
-    && rm -f aarch64-none-elf.tar
-
 # Install BASH
 RUN apt install bash -y
 SHELL ["/bin/bash", "-c"]
@@ -131,5 +125,21 @@ RUN apt install python3-cryptography -y
 # copy script for rpi4-ws demo
 COPY files/build.sh $WORKDIR_PATH/
 
-# make sure path is updated
-RUN echo 'export PATH="/work/gcc-arm-11.2-2022.02-x86_64-aarch64-none-elf/bin:$PATH"' >> ~/.bashrc
+# Install Linaro AArch64 bare-metal toolchain (aarch64-none-elf)
+RUN wget https://releases.linaro.org/archive/14.11/components/toolchain/binaries/aarch64-none-elf/gcc-linaro-4.9-2014.11-x86_64_aarch64-elf.tar.xz \
+    && tar -xf gcc-linaro-4.9-2014.11-x86_64_aarch64-elf.tar.xz -C /opt \
+    && rm -f gcc-linaro-4.9-2014.11-x86_64_aarch64-elf.tar.xz
+
+# Install Arm GNU toolchain
+RUN wget -O aarch64-none-elf.tar.xz "https://developer.arm.com/-/media/Files/downloads/gnu/11.2-2022.02/binrel/gcc-arm-11.2-2022.02-x86_64-aarch64-none-elf.tar.xz?rev=981d8f7e91864070a466d852589598e2&hash=8D5397D4E41C99A96989ED813E8E95F0" \
+    && unxz aarch64-none-elf.tar.xz \
+    && tar -xvf aarch64-none-elf.tar \
+    && rm -f aarch64-none-elf.tar
+
+# Install ARM Developer Toolchain (AArch64-none-elf, Linux version)
+RUN wget https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-elf.tar.xz \
+&& tar -xf arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-elf.tar.xz -C /opt \
+&& rm -f arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-elf.tar.xz
+
+# Update PATH for arm developer toolchain
+RUN echo 'export PATH="/opt/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-elf/bin:$PATH"' >> ~/.bashrc
