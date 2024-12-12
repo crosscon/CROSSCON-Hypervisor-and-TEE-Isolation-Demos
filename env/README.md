@@ -14,35 +14,35 @@ docker build -t crosscon_hv .
 ```
 
 to build the docker image. The resulting image will have a `crosscon_hv` tag.
-After the image has been built you can create and start a container directly by
-running:
+After the image has been built, a container can be created and started directly
+by running this command:
 
 ```bash
 docker run -d --name crosscon_hv_container crosscon_hv tail -f /dev/null
 ```
 
-Then, to enter the shell of the running container, use this command:
+Then, to enter the shell of the running container, this command can be used:
 
 ```bash
 docker exec -it crosscon_hv_container /bin/bash
 ```
 
-> Note: If at any point when rebuilding/rerunning the container you get error messages
-> similar to this one:
-
-```bash
-docker: Error response from daemon: Conflict. The container name
-"/crosscon_hv_container" is already in use by container
-"d6ee75901fd0e090147d242c485651ebf5c4fc58e13d8363725a6cab830a9ba0". You have to
-remove (or rename) that container to be able to reuse that name.
-See 'docker run --help'.
-```
-
-Just use this command:
-
-```bash
-docker rm --force <hash_of_the_container_from_the_error_message>
-```
+> Note: If at any point when rebuilding/rerunning the container, error messages
+> similar to this one pop up:
+>
+> ```bash
+> docker: Error response from daemon: Conflict. The container name
+> "/crosscon_hv_container" is already in use by container
+> "d6ee75901fd0e090147d242c485651ebf5c4fc58e13d8363725a6cab830a9ba0". You have to
+> remove (or rename) that container to be able to reuse that name.
+> See 'docker run --help'.
+> ```
+>
+> This command should be used:
+>
+> ```bash
+> docker rm --force <hash_of_the_container_from_the_error_message>
+> ```
 
 ## Building the rpi4-ws demo
 
@@ -54,49 +54,25 @@ user in ~/CROSSCON-Hypervisor-and-TEE-Isolation-Demos/env λ docker exec -it cro
 root@d6ee75901fd0:/work#
 ```
 
-Then you should `cd crosscon`, and follow the instructions from
-[the README](../rpi4-ws/README.md).
+Then `cd crosscon` should be ran, and the instructions from
+[the README](../rpi4-ws/README.md) followed.
 
-This will allow you to build the binaries, since the container has all the
-necessary dependencies, but here are some important tips to bear in mind:
-
-### Cross-compilator names
-
-Sometimes, the instructions are not 100% accurate when it comes to the
-`CROSS_COMPILE` flag in the `make` commands. The only time i have come across
-this, is when trying to compile the `optee_client`, the readme says to do this:
-
-```bash
-make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out-aarch64
-```
-
-but the correct command for debian (which our container is based off of) is this:
-
-```bash
-make CROSS_COMPILE=aarch64-linux-gnu- WITH_TEEACL=0 O=out-aarch64
-```
-
-as you can see the `CROSS_COMPILE` argument should be `aarch64-linux-gnu-`, NOT
-`aarch64-none-linux-gnu-`. If you ever encounter build errors, this should be
-the first thing to check.
-
-> Note: while `aarch64-none-linux-gnu-` is supposed to be the bare-metal
-> cross-compiler, having it on the container causes internal compiler errors and
-its unusable. `aarch64-linux-gnu-` Seens to work just fine for our purposes.
+This will allow the binaries to be built, since the container has all the
+necessary dependencies.
 
 ### Copying the files to the SD card.
 
-Obviously, the container allows you to build the binaries without worrying about
-dependencies. But you also have to get them on the SD card in order to boot
-the demo.
+Obviously, the container allows the binaries to be built without worrying about
+dependencies. But in the end they have to end up on the SD card in order to
+boot the demo.
 
 #### Firmware and bootloader files
 
-In order to correctly do this, first you have to make sure get the firmware
-files over from the container on your host. Instead of doing this:
+In order to correctly do this, first the firmware files have to be transferred
+over from the container to the host. Instead of doing this:
 
-> Note: Before running the following commands, ensure you have inserted the
-> SD card into your host machine and that it is mounted at /media/$USER/boot
+> Note: Before running the following commands, ensure that the SD card is
+> inserted into the host machine and that it is mounted at /media/$USER/boot
 > (adjust the path as necessary if your system uses a different mount point).
 
 ```bash
@@ -109,10 +85,9 @@ cp -v bin/bl31.bin $SDCARD
 cp -v bin/u-boot.bin $SDCARD
 ```
 
-like the readme tells you to, you will have to run these commands on host
-(here I assumed that we are copying the files directly over to the SD card,
-but it doesnt really matter. If you want to, you can copy them to host,
-then later to the SD card):
+Then these commands can be ran to copy over the firmware to the SD card (this
+syntax assumes they are being copied directly from the container to the SD
+card):
 
 ```bash
 sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/firmware/boot/ /run/media/$USER/
@@ -123,9 +98,9 @@ sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/bin/u-boot.bin /run/
 
 #### Linux and Device Tree Image
 
-After you’ve built the Linux kernel and used lloader to produce
-`linux-rpi4.bin`, you’ll need to copy that file out of the container and onto
-your SD card:
+After the Linux kernel has been build and lloader has been used to produce
+`linux-rpi4.bin`, that file will need to be copied out of the container and onto
+the SD card:
 
 ```bash
 docker cp crosscon_hv_container:/work/crosscon/lloader/linux-rpi4.bin /media/$USER/boot
@@ -134,24 +109,24 @@ docker cp crosscon_hv_container:/work/crosscon/lloader/linux-rpi4.bin /media/$US
 #### Copying the CROSSCON Hypervisor Binary
 
 Building and copying of the hypervisor binary is done in the same script,
-either `build-demo-vtee.sh` or `build-demo-dual-vtee.sh`. If you look at the
-content of those scripts, you will see that they build the `crossconhyp.bin`
-files, then copies `start*` firmware files and `crossconhyp.bin` to the SD card
-mount point.
+either `build-demo-vtee.sh` or `build-demo-dual-vtee.sh`. By looking at the
+content of those scripts, it can be determined that they build the
+`crossconhyp.bin` files, then copies `start*` firmware files and
+`crossconhyp.bin` to the SD card mount point.
 
-> Note: this readme only covers the `build-demo-vtee.sh` script, since once
-> you understand the idea of what we are doing here, it becomes easy to think
+> Note: this readme only covers the `build-demo-vtee.sh` script, since
+> the idea of what is being here is understood, it becomes easy to think
 > of the commands to achieve what goes on in the `dual` version of the script.
 
-Since we are inside a container, we will have to build the hypervisor manually,
-then copy it over to host. Once you get to the end of
-[the README](../rpi4-ws/README.md), instead of just running the script:
+The hypervisor will have to be built manually, then copied over to the host.
+Once the end of the [the README](../rpi4-ws/README.md) demo has been reached,
+instead of just running the script:
 
 ```bash
 ./build-demo-vtee.sh
 ```
 
-we will have to build those files manually:
+those files will have to be built manually:
 
 ```bash
 cd /work/crosscon
@@ -177,15 +152,15 @@ make -C CROSSCON-Hypervisor/ \
         -j`nproc`
 ```
 
-Then make sure that the hypervisor got built correctly, and that the firmware files
-exist:
+Then confirm that the hypervisor got built correctly, and that the firmware
+files exist:
 
 ```bash
 ls /work/crosscon/rpi4-ws/bin/
 ls /work/crosscon/CROSSCON-Hypervisor/bin/rpi4/builtin-configs/rpi4-single-vTEE/
 ```
 
-Then finally copy those files over to the host:
+Then finally those files can be copied over to host:
 
 ```bash
 sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/firmware/boot/start* $SDCARD_MOUNT/
