@@ -132,4 +132,4 @@ RUN apt install python3-cryptography -y
 COPY files/build.sh $WORKDIR_PATH/
 
 # make sure path is updated
-RUN echo 'export PATH=/opt/arm-gnu-toolchain-*-x86_64-aarch64-none-elf/bin:$PATH' >> ~/.bashrc
+RUN echo 'export PATH="/work/gcc-arm-11.2-2022.02-x86_64-aarch64-none-elf/bin:$PATH"' >> ~/.bashrc
