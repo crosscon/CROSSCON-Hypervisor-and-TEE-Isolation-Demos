@@ -70,7 +70,7 @@ this, is when trying to compile the `optee_client`, the readme says to do this:
 make CROSS_COMPILE=aarch64-none-linux-gnu- WITH_TEEACL=0 O=out-aarch64
 ```
 
-but the correct command for ubuntu (which our container is based off of) is this:
+but the correct command for debian (which our container is based off of) is this:
 
 ```bash
 make CROSS_COMPILE=aarch64-linux-gnu- WITH_TEEACL=0 O=out-aarch64
