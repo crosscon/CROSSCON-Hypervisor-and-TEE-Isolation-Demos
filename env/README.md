@@ -14,18 +14,16 @@ docker build -t crosscon_hv .
 ```
 
 to build the docker image. The resulting image will have a `crosscon_hv` tag.
-After the image has been built you will need to create a container from that
-image, it can be done with this command:
-
-```bash
-docker create --name crosscon_hv_container crosscon_hv
-```
-
-Then all that's left to do is run the image and enter the shell of the
-container, by running these commands:
+After the image has been built you can create and start a container directly by
+running:
 
 ```bash
 docker run -d --name crosscon_hv_container crosscon_hv tail -f /dev/null
+```
+
+Then, to enter the shell of the running container, use this command:
+
+```bash
 docker exec -it crosscon_hv_container /bin/bash
 ```
 
