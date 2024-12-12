@@ -143,3 +143,7 @@ RUN wget https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/
 
 # Update PATH for arm developer toolchain
 RUN echo 'export PATH="/opt/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-elf/bin:$PATH"' >> ~/.bashrc
+
+# Make the starting directory is the CROSSCON Demos directory
+WORKDIR $WORKDIR_PATH/crosscon
+ENV ROOT=$WORKDIR_PATH/crosscon
