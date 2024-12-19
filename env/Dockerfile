@@ -50,7 +50,7 @@ RUN wget http://ftp.pl.debian.org/debian/pool/main/m/make-dfsg/make_4.2.1-1.2_am
     && rm -f make_4.2.1-1.2_amd64.deb
 
 # Install dtc 1.6.1
-COPY patches/dtc $WORKDIR_PATH/patches/dtc/
+COPY env/patches/dtc $WORKDIR_PATH/patches/dtc/
 
 RUN git clone https://salsa.debian.org/crosstoolchain-team/device-tree-compiler.git \
     && cd device-tree-compiler \
@@ -84,7 +84,7 @@ RUN wget http://ftp.pl.debian.org/debian/pool/main/libj/libjsoncpp/libjsoncpp24_
     && rm -f libjsoncpp24_1.9.4-4_amd64.deb
 
 # Install Cmake 3.20.0
-COPY patches/cmake $WORKDIR_PATH/patches/cmake/
+COPY env/patches/cmake $WORKDIR_PATH/patches/cmake/
 
 RUN wget https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz \
     && tar -xvf cmake-3.20.0.tar.gz \
@@ -107,24 +107,11 @@ RUN wget http://ftp.pl.debian.org/debian/pool/main/n/ninja-build/ninja-build_1.1
 RUN apt install bash -y
 SHELL ["/bin/bash", "-c"]
 
-# Update PATH
-COPY files/env.sh $WORKDIR_PATH/
-
-# Setup CROSSCON repository
-RUN git clone https://github.com/crosscon/CROSSCON-Hypervisor-and-TEE-Isolation-Demos.git \
-    && mv CROSSCON-Hypervisor-and-TEE-Isolation-Demos $WORKDIR_PATH/crosscon
-
-COPY files/.gitmodules $WORKDIR_PATH/crosscon/.gitmodules
-
-RUN cd $WORKDIR_PATH/crosscon && \
-    git submodule init && \
-    git submodule update --depth 1
-
 # Fix missing "cryptography" python module
 RUN apt install python3-cryptography -y
 
 # copy script for rpi4-ws demo
-COPY files/build.sh $WORKDIR_PATH/
+COPY env/files/build.sh $WORKDIR_PATH/
 
 # Install Arm Bare-metal toolchain
 RUN wget -O aarch64-none-elf.tar.xz "https://developer.arm.com/-/media/Files/downloads/gnu/11.2-2022.02/binrel/gcc-arm-11.2-2022.02-x86_64-aarch64-none-elf.tar.xz?rev=981d8f7e91864070a466d852589598e2&hash=8D5397D4E41C99A96989ED813E8E95F0" \
@@ -142,6 +129,15 @@ RUN wget -O aarch64-none-linux-gnu.tar.xz "https://developer.arm.com/-/media/Fil
 # Update PATH for arm developer toolchain
 ENV PATH="$WORKDIR_PATH/gcc-arm-11.2-2022.02-x86_64-aarch64-none-elf/bin:$PATH"
 ENV PATH="$WORKDIR_PATH/gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu/bin:$PATH"
+
+# Setup CROSSCON repository
+COPY ./ $WORKDIR_PATH/crosscon
+
+COPY env/files/.gitmodules $WORKDIR_PATH/crosscon/.gitmodules
+
+RUN cd $WORKDIR_PATH/crosscon && \
+    git submodule init && \
+    git submodule update --depth 1
 
 # Make the starting directory is the CROSSCON Demos directory
 WORKDIR $WORKDIR_PATH/crosscon
