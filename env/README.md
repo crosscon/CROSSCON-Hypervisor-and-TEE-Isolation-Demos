@@ -7,10 +7,10 @@ compilation of the CROSSCON hypervisor.
 
 ## How to build the container
 
-Run this command:
+Run this command from top of the repository:
 
 ```bash
-docker build -t crosscon_hv .
+docker build -t crosscon_hv -f env/Dockerfile .
 ```
 
 to build the docker image. The resulting image will have a `crosscon_hv` tag.
