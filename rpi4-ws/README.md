@@ -262,7 +262,7 @@ export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export ARCH=aarch64
 export PLATFORM=plat-vexpress
 export PLATFORM_FLAVOR=qemu_armv8a
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-rpi4/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=y
@@ -284,7 +284,7 @@ make install
 
 export O=`pwd`/out2-aarch64
 export DESTDIR=./to_buildroot-aarch64-2
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2-rpi4/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
 rm -rf `pwd`/out2-aarch64
@@ -312,7 +312,7 @@ export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export ARCH=aarch64
 export PLATFORM=plat-virt
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-rpi4/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=n
@@ -338,7 +338,7 @@ chmod +x to_buildroot-aarch64/bin/bitcoin_wallet_ca
 ## setup second OP-TEE
 export O=`pwd`/out2-aarch64
 export DESTDIR=./to_buildroot-aarch64-2
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2-rpi4/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
 rm -rf `pwd`/out2-aarch64
@@ -371,7 +371,7 @@ export HOST_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export TA_CROSS_COMPILE=$BUILDROOT/host/bin/aarch64-linux-
 export ARCH=aarch64
 export PLATFORM=plat-virt
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-aarch64/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee-rpi4/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out-aarch64/export/usr/
 export CFG_TA_OPTEE_CORE_API_COMPAT_1_1=n
@@ -394,7 +394,7 @@ chmod +x to_buildroot-aarch64/bin/malicious_ca
 ## setup second OP-TEE
 export O=`pwd`/out2-aarch64
 export DESTDIR=./to_buildroot-aarch64-2
-export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2-aarch64/export-ta_arm64
+export TA_DEV_KIT_DIR=`pwd`/../optee_os/optee2-rpi4/export-ta_arm64
 export TEEC_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
 export OPTEE_CLIENT_EXPORT=`pwd`/../optee_client/out2-aarch64/export/usr/
 rm -rf `pwd`/out2-aarch64
