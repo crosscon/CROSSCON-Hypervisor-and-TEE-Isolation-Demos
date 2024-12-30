@@ -375,8 +375,7 @@ cd $ROOT
 ```
 
 ### Simple Demo'
-This demo instantiates a Linux VM and an OP-TEE VM.
-Insert the sdcard in your pc, and wait for it to mount the boot partition. The script expects it to be mount on `/media/$USER/boot`
+This demo instantiates a Linux VM and an OP-TEE VM. 
 ``` sh
 ./build-demo-vtee.sh
 ```
@@ -385,7 +384,9 @@ Insert the sdcard in your pc, and wait for it to mount the boot partition. The s
 
 # Setup SD card
 
-Copy the firmware and crossconhyp's final image to the sdcard:
+Insert the sdcard in your pc, and wait for it to mount the boot partition.
+Otherwise mount the sd card manually. Copy the firmware and crossconhyp's final
+image to the sdcard:
 
 ```
 cp bin/BOOT.BIN /media/$USER/boot

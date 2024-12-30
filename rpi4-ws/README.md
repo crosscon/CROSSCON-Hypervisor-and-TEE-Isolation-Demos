@@ -466,8 +466,10 @@ cd $ROOT
 
 
 ### Simple Demo
-This demo instantiates a Linux VM and an OP-TEE VM.
-Insert the sdcard in your pc, and wait for it to mount the boot partition. The script expects it to be mount on `/media/$USER/boot`
+This demo instantiates a Linux VM and an OP-TEE VM. Insert the sdcard in your
+pc, and wait for it to mount the boot partition. Otherwise mount the sd card
+manually. The script expects `SDCARD` to be set (e.g.,`/media/$USER/boot`)
+
 ``` sh
 ./build-demo-vtee.sh
 ```
