@@ -141,6 +141,15 @@ RUN cd $WORKDIR_PATH/crosscon && \
     git submodule init && \
     git submodule update --depth 1
 
+# Add support for aarch64 packages
+RUN dpkg --add-architecture arm64
+
+# Add trixie repository to install the libteec2 package for aarch64
+RUN echo "deb http://deb.debian.org/debian trixie main" >> /etc/apt/sources.list && \
+    echo "deb-src http://deb.debian.org/debian trixie main" >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get -t trixie install -y libteec2:arm64
+
 # Make the starting directory is the CROSSCON Demos directory
 WORKDIR $WORKDIR_PATH/crosscon
 ENV ROOT=$WORKDIR_PATH/crosscon
