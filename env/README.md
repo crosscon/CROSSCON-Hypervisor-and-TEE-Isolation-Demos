@@ -69,31 +69,21 @@ boot the demo.
 #### Firmware and bootloader files
 
 In order to correctly do this, first the firmware files have to be transferred
-over from the container to the host. Instead of doing this:
+over from the container to the host.
 
 > Note: Before running the following commands, ensure that the SD card is
-> inserted into the host machine and that it is mounted at /media/$USER/boot
-> (adjust the path as necessary if your system uses a different mount point).
+> inserted into the host machine and that it is mounted.
+> (adjust the commands in this README to fit your SD card mount point).
 
-```bash
-cd $RPI4_WS
-SDCARD=/media/$USER/boot
-
-cp -vr firmware/boot/* $SDCARD
-cp -v config.txt $SDCARD
-cp -v bin/bl31.bin $SDCARD
-cp -v bin/u-boot.bin $SDCARD
-```
-
-Then these commands can be ran to copy over the firmware to the SD card (this
+These commands can be ran to copy over the firmware to the SD card (this
 syntax assumes they are being copied directly from the container to the SD
 card):
 
 ```bash
-sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/firmware/boot/ /run/media/$USER/
-sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/config.txt /run/media/$USER/boot/
-sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/bin/bl31.bin /run/media/$USER/boot/
-sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/bin/u-boot.bin /run/media/$USER/boot/
+sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/firmware/boot/ $SDCARD_MOUNT/
+sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/config.txt $SDCARD_MOUNT/
+sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/bin/bl31.bin $SDCARD_MOUNT/
+sudo docker cp crosscon_hv_container:/work/crosscon/rpi4-ws/bin/u-boot.bin $SDCARD_MOUNT/
 ```
 
 #### Linux and Device Tree Image
@@ -103,7 +93,7 @@ After the Linux kernel has been build and lloader has been used to produce
 the SD card:
 
 ```bash
-docker cp crosscon_hv_container:/work/crosscon/lloader/linux-rpi4.bin /media/$USER/boot
+docker cp crosscon_hv_container:/work/crosscon/lloader/linux-rpi4.bin $SDCARD_MOUNT/
 ```
 
 #### Copying the CROSSCON Hypervisor Binary
