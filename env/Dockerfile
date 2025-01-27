@@ -150,6 +150,10 @@ RUN echo "deb http://deb.debian.org/debian trixie main" >> /etc/apt/sources.list
     apt-get update && \
     apt-get -t trixie install -y libteec2:arm64
 
+# Clean cached apt, package lists and temprorary files to reduce image size
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # Make the starting directory is the CROSSCON Demos directory
 WORKDIR $WORKDIR_PATH/crosscon
 ENV ROOT=$WORKDIR_PATH/crosscon
