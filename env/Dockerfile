@@ -107,6 +107,8 @@ RUN wget http://ftp.pl.debian.org/debian/pool/main/n/ninja-build/ninja-build_1.1
 RUN apt install bash -y
 SHELL ["/bin/bash", "-c"]
 
+COPY env/files/.gitmodules $WORKDIR_PATH/crosscon/.gitmodules
+
 # Fix missing "cryptography" python module
 RUN apt install python3-cryptography -y
 
