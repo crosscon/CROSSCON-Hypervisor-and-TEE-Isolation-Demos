@@ -42,7 +42,10 @@ RUN apt-get update && \
     gcc-riscv64-linux-gnu \
     g++-riscv64-linux-gnu \
     binutils-riscv64-linux-gnu \
-    libncurses-dev
+    libncurses-dev \
+    fdisk \
+    dosfstools
+
 
 # Install Make 4.2.1
 RUN wget http://ftp.pl.debian.org/debian/pool/main/m/make-dfsg/make_4.2.1-1.2_amd64.deb \

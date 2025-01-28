@@ -21,6 +21,9 @@ by running this command:
 docker run -d --name crosscon_hv_container crosscon_hv tail -f /dev/null
 ```
 
+> This step also is dependant on how you want to Flash the SD card later. All
+approaches are specified [below](#Copying-the-files-to-the-SD-card.).
+
 Then, to enter the shell of the running container, this command can be used:
 
 ```bash
@@ -43,6 +46,12 @@ docker exec -it crosscon_hv_container /bin/bash
 > ```bash
 > docker rm --force <hash_of_the_container_from_the_error_message>
 > ```
+>
+> Alternatively:
+>
+> ```bash
+> docker rm --force crosscon_hv_container
+> ```
 
 ## Building the rpi4-ws demo
 
@@ -60,16 +69,30 @@ Then `cd crosscon` should be ran, and the instructions from
 This will allow the binaries to be built, since the container has all the
 necessary dependencies.
 
-### Copying the files to the SD card.
+## Copying the files to the SD card.
 
 Obviously, the container allows the binaries to be built without worrying about
 dependencies. But in the end they have to end up on the SD card in order to
 boot the demo.
 
-#### Firmware and bootloader files
+### Running the container as privileged
 
-In order to correctly do this, first the firmware files have to be transferred
-over from the container to the host.
+You can pass all your devices to the container and use the
+[Prepare SDCard](https://github.com/3mdeb/CROSSCON-Hypervisor-and-TEE-Isolation-Demos/tree/master/rpi4-ws#prepare-sdcard)
+instructions directly from inside of it using the `--privileged` flag or more restrictively pass only the
+single SD card.
+
+```bash
+docker run -d --name crosscon_hv_container_copy --privileged crosscon_hv_copy tail -f /dev/null
+```
+
+```bash
+docker run -d --name crosscon_hv_container_copy --device=/dev/sdX:/dev/sdX crosscon_hv_copy tail -f /dev/null
+```
+
+### Unprivileged container
+
+#### Firmware and bootloader files
 
 > Note: Before running the following commands, ensure that the SD card is
 > inserted into the host machine and that it is mounted.
