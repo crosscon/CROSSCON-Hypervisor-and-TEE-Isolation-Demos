@@ -1,0 +1,28 @@
+diff --git a/Makefile b/Makefile
+index e6b32cf1cbf5..c1dc04de7edc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -18,7 +18,8 @@ CONFIG_LOCALVERSION =
+ CPPFLAGS = -I libfdt -I .
+ WARNINGS = -Wall -Wpointer-arith -Wcast-qual -Wnested-externs \
+ 	-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wshadow
+-CFLAGS = -g -Os $(SHAREDLIB_CFLAGS) -Werror $(WARNINGS)
++CFLAGS = -g -Os $(SHAREDLIB_CFLAGS) $(WARNINGS)
++
+ 
+ BISON = bison
+ LEX = flex
+diff --git a/dtc-lexer.l b/dtc-lexer.l
+index 06c040902444..b5b1443f171d 100644
+--- a/dtc-lexer.l
++++ b/dtc-lexer.l
+@@ -38,7 +38,8 @@ LINECOMMENT	"//".*\n
+ #include "srcpos.h"
+ #include "dtc-parser.tab.h"
+ 
+-YYLTYPE yylloc;
++#define YYLTYPE_IS_DECLARED 1
++
+ extern bool treesource_error;
+ 
+ /* CAUTION: this will stop working if we ever use yyless() or yyunput() */
