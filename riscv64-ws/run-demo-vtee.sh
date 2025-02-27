@@ -8,9 +8,10 @@ make -C CROSSCON-Hypervisor/ \
 	CONFIG_BUILTIN=y \
 	CONFIG_REPO=$CONFIG_REPO \
 	CONFIG=qemu-virt-riscv64-single-vTEE \
-	OPTIMIZATIONS=0 \
+	OPTIMIZATIONS=g \
+	DEBUG=y \
         SDEES="sdSGX sdTZ" \
-        CROSS_COMPILE=riscv64-unknown-elf- \
+        CROSS_COMPILE=/home/david/Documents/PARA/2-Areas/PhD/Research/tools/riscv-toolchain/bin/riscv64-unknown-elf- \
         clean
 
 make -C CROSSCON-Hypervisor/ \
@@ -18,9 +19,10 @@ make -C CROSSCON-Hypervisor/ \
 	CONFIG_BUILTIN=y \
 	CONFIG_REPO=$CONFIG_REPO \
 	CONFIG=qemu-virt-riscv64-single-vTEE \
-	OPTIMIZATIONS=0 \
+	OPTIMIZATIONS=g \
+	DEBUG=y \
         SDEES="sdSGX sdTZ" \
-	CROSS_COMPILE=riscv64-unknown-elf- \
+	CROSS_COMPILE=/home/david/Documents/PARA/2-Areas/PhD/Research/tools/riscv-toolchain/bin/riscv64-unknown-elf- \
         -j`nproc`
 
 rm -rf opensbi/build/
@@ -28,8 +30,8 @@ make -C opensbi \
 	PLATFORM=generic \
 	FW_PAYLOAD=y \
 	FW_PAYLOAD_FDT_ADDR=0x80100000 \
-	FW_PAYLOAD_PATH=../CROSSCON-Hypervisor/bin/qemu-riscv64-virt/builtin-configs/qemu-virt-riscv64-single-vTEE/crossconhyp.bin \
-	CROSS_COMPILE=riscv64-unknown-elf- \
+	FW_PAYLOAD_PATH=../CROSSCON-Hypervisor/bin/qemu-riscv64-virt/qemu-virt-riscv64-single-vTEE/crossconhyp.bin \
+	CROSS_COMPILE=/home/david/Documents/PARA/2-Areas/PhD/Research/tools/riscv-toolchain/bin/riscv64-unknown-elf- \
 	-j7
 
 cp -v opensbi/build/platform/generic/firmware/fw_payload.elf riscv64-ws/

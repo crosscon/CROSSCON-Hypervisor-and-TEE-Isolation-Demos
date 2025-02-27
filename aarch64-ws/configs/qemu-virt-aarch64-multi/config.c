@@ -1,6 +1,6 @@
 #include <config.h>
 
-VM_IMAGE(baremetal_image, "../support/baremetal-aarch64.bin");
+VM_IMAGE(baremetal_image, "../support/baremetal-aarch64.bin")
 
 struct vm_config baremetal = {
     .image = {
@@ -15,7 +15,7 @@ struct vm_config baremetal = {
         .cpu_num = 1,
 
         .region_num = 1,
-        .regions =  (struct mem_region[]) {
+        .regions =  (struct vm_mem_region[]) {
             {
                 .base = 0x50000000,
                 .size = 0x04000000
@@ -23,7 +23,7 @@ struct vm_config baremetal = {
         },
 
         .dev_num = 2,
-        .devs =  (struct dev_region[]) {
+        .devs =  (struct vm_dev_region[]) {
             {
                 /* PL011 */
                 .pa = 0x90c0000,
@@ -48,7 +48,7 @@ struct vm_config baremetal = {
     },
 };
 
-VM_IMAGE(freertos_image, "../support/freertos-aarch64.bin");
+VM_IMAGE(freertos_image, "../support/freertos-aarch64.bin")
 
 struct vm_config freertos = {
     .image = {
@@ -63,7 +63,7 @@ struct vm_config freertos = {
         .cpu_num = 1,
 
         .region_num = 1,
-        .regions =  (struct mem_region[]) {
+        .regions =  (struct vm_mem_region[]) {
             {
                 .base = 0x00000000,
                 .size = 0x08000000
@@ -82,7 +82,7 @@ struct vm_config freertos = {
         },
 
         .dev_num = 2,
-        .devs =  (struct dev_region[]) {
+        .devs =  (struct vm_dev_region[]) {
             {
                 /* PL011 */
                 .pa = 0x090c0000,
@@ -107,9 +107,9 @@ struct vm_config freertos = {
 
 
 // Linux Image
-VM_IMAGE(linux_image, "../lloader/linux-aarch64.bin");
+VM_IMAGE(linux_image, "../lloader/linux-aarch64.bin")
 // Linux VM configuration
-struct vm_config linux = {
+struct vm_config linux_vm = {
     .image = {
         .base_addr = 0x40200000,
         .load_addr = VM_IMAGE_OFFSET(linux_image),
@@ -122,7 +122,7 @@ struct vm_config linux = {
     .platform = {
         .cpu_num = 1,
         .region_num = 1,
-        .regions =  (struct mem_region[]) {
+        .regions =  (struct vm_mem_region[]) {
             {
                 .base = 0x40000000,
                 .size = 0x30000000,
@@ -138,7 +138,7 @@ struct vm_config linux = {
             },
         },
         .dev_num = 2,
-        .devs =  (struct dev_region[]) {
+        .devs =  (struct vm_dev_region[]) {
             {
                 .pa = 0x9000000,
                 .va = 0x9000000,
@@ -171,8 +171,8 @@ struct config config = {
         [3] = { .size = 0x00010000, },
     },
     .vmlist_size = 3,
-    .vmlist = {
-        &linux,
+    .vmlist = (struct vm_config*[]) {
+        &linux_vm,
         &baremetal,
         &freertos,
     }

@@ -9,6 +9,7 @@ make -C CROSSCON-Hypervisor/ \
 	CONFIG_REPO=$CONFIG_REPO \
 	CONFIG=qemu-virt-riscv64-per-vm-vTEE \
 	OPTIMIZATIONS=g \
+        DEBUG=y \
         SDEES="sdSGX sdTZ" \
         CROSS_COMPILE=riscv64-unknown-elf- \
         clean
@@ -19,6 +20,7 @@ make -C CROSSCON-Hypervisor/ \
 	CONFIG_REPO=$CONFIG_REPO \
 	CONFIG=qemu-virt-riscv64-per-vm-vTEE \
 	OPTIMIZATIONS=g \
+        DEBUG=y \
         SDEES="sdSGX sdTZ" \
 	CROSS_COMPILE=riscv64-unknown-elf- \
         -j`nproc`
@@ -28,7 +30,7 @@ make -C opensbi \
 	PLATFORM=generic \
 	FW_PAYLOAD=y \
 	FW_PAYLOAD_FDT_ADDR=0x80100000 \
-	FW_PAYLOAD_PATH=`pwd`/CROSSCON-Hypervisor/bin/qemu-riscv64-virt/builtin-configs/qemu-virt-riscv64-per-vm-vTEE/crossconhyp.bin \
+	FW_PAYLOAD_PATH=`pwd`/CROSSCON-Hypervisor/bin/qemu-riscv64-virt/qemu-virt-riscv64-per-vm-vTEE/crossconhyp.bin \
 	CROSS_COMPILE=riscv64-unknown-elf- \
 	-j`nproc`
 

@@ -1,7 +1,7 @@
 #include <config.h>
 
-VM_IMAGE(linux, "../lloader/linux-riscv64.bin");
-struct vm_config linux = {
+VM_IMAGE(linux, "../lloader/linux-riscv64.bin")
+struct vm_config linux_vm = {
     .image = {
         .base_addr = 0x91600000,
         .load_addr = VM_IMAGE_OFFSET(linux),
@@ -16,7 +16,7 @@ struct vm_config linux = {
         .cpu_num = 1,
 
         .region_num = 2,
-        .regions =  (struct mem_region[]) {
+        .regions =  (struct vm_mem_region[]) {
 	    {
 		.base = 0x91200000,
 		.size = 0x07d00000
@@ -42,7 +42,7 @@ struct vm_config linux = {
         },
 
 	.dev_num = 1,
-	.devs =  (struct dev_region[]) {
+	.devs =  (struct vm_dev_region[]) {
 	    {
 		.pa = 0x10000000,
 		.va = 0x10000000,
@@ -53,14 +53,18 @@ struct vm_config linux = {
 	},
 
         .arch = {
-            .plic_base = 0xc000000,
+            .irqc = {
+                .plic = {
+                    .base = 0xc000000,
+                }
+            }
         }
     },
 };
 
 
 
-VM_IMAGE(optee, "../optee_os/optee-riscv/core/tee.bin");
+VM_IMAGE(optee, "../optee_os/optee-riscv/core/tee.bin")
 struct vm_config optee = {
     .image = {
         .base_addr = 0xb0000000,
@@ -73,13 +77,13 @@ struct vm_config optee = {
     .type = 1,
 
     .children_num = 1,
-    .children = (struct vm_config*[]) { &linux },
+    .children = (struct vm_config*[]) { &linux_vm },
 
     .platform = {
         .cpu_num = 1,
 
         .region_num = 1,
-        .regions =  (struct mem_region[]) {
+        .regions =  (struct vm_mem_region[]) {
 
 	    {
 		.base = 0xb0000000,
@@ -98,7 +102,7 @@ struct vm_config optee = {
         },
 
         .dev_num = 1,
-        .devs =  (struct dev_region[]) {
+        .devs =  (struct vm_dev_region[]) {
             {
                 /* UART */
                 .pa = 0x10000000,
@@ -108,7 +112,12 @@ struct vm_config optee = {
         },
 
         .arch = {
-            .plic_base = 0xc000000,
+            .irqc = {
+                .plic = {
+                    .base = 0xc000000,
+                }
+            }
+
         }
     },
 };
@@ -126,7 +135,7 @@ struct config config = {
     },
 
     .vmlist_size = 1,
-    .vmlist = {
+    .vmlist = (struct vm_config*[]) {
         &optee
     }
 };

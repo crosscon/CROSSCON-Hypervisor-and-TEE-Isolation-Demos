@@ -9,7 +9,7 @@ make -C CROSSCON-Hypervisor/ \
 	CONFIG_BUILTIN=y \
 	CONFIG_REPO=$CONFIG_REPO \
 	CONFIG=qemu-virt-aarch64-dual-vTEE \
-	OPTIMIZATIONS=0 \
+	OPTIMIZATIONS=g \
         SDEES="sdSGX sdTZ" \
 	CROSS_COMPILE=aarch64-none-elf- \
         clean
@@ -19,12 +19,13 @@ make -C CROSSCON-Hypervisor/ \
 	CONFIG_BUILTIN=y \
 	CONFIG_REPO=$CONFIG_REPO \
 	CONFIG=qemu-virt-aarch64-dual-vTEE \
-	OPTIMIZATIONS=0 \
+	OPTIMIZATIONS=g \
+        DEBUG=y \
         SDEES="sdSGX sdTZ" \
 	CROSS_COMPILE=aarch64-none-elf- \
         -j`nproc`
 
-cp -uv CROSSCON-Hypervisor/bin/qemu-aarch64-virt/builtin-configs/qemu-virt-aarch64-dual-vTEE/crossconhyp.bin ./aarch64-ws/bl33.bin
+cp -uv CROSSCON-Hypervisor/bin/qemu-aarch64-virt/qemu-virt-aarch64-dual-vTEE/crossconhyp.bin ./aarch64-ws/bl33.bin
 
 popd
 

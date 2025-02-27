@@ -1,6 +1,6 @@
 #include <config.h>
 // Linux Image
-VM_IMAGE(linux_image, "../lloader/linux-aarch64.bin");
+VM_IMAGE(linux_image, "../lloader/linux-aarch64.bin")
 // Linux VM configuration
 struct vm_config linux = {
     .image = {
@@ -15,7 +15,7 @@ struct vm_config linux = {
     .platform = {
         .cpu_num = 1,
         .region_num = 1,
-        .regions =  (struct mem_region[]) {
+        .regions =  (struct vm_mem_region[]) {
             {
                 .base = 0x40000000,
                 .size = 0x30000000,
@@ -30,7 +30,7 @@ struct vm_config linux = {
             }, 
         },
         .dev_num = 2,
-        .devs =  (struct dev_region[]) {
+        .devs =  (struct vm_dev_region[]) {
             {
                 .pa = 0x9000000,
                 .va = 0x9000000,
@@ -53,7 +53,7 @@ struct vm_config linux = {
     }
 };
 
-VM_IMAGE(optee_image, "../optee_os/optee/core/tee-pager_v2.bin");
+VM_IMAGE(optee_image, "../optee_os/optee/core/tee-pager_v2.bin")
 
 struct vm_config optee = {
     .image = {
@@ -72,7 +72,7 @@ struct vm_config optee = {
     .platform = {
         .cpu_num = 1,
         .region_num = 1,
-        .regions = (struct mem_region[]) {
+        .regions = (struct vm_mem_region[]) {
             {
                 .base = 0x10100000,
                 .size = 0x00F00000, // 15 MB
@@ -87,7 +87,7 @@ struct vm_config optee = {
             }
         },
         .dev_num = 2,
-        .devs = (struct dev_region[]) {
+        .devs = (struct vm_dev_region[]) {
             {
                 // PL011
                 .va = 0x9040000,
@@ -113,7 +113,7 @@ struct vm_config optee = {
 
 #include <config.h>
 // Linux Image
-VM_IMAGE(linux2_image, "../lloader/linux2-aarch64.bin");
+VM_IMAGE(linux2_image, "../lloader/linux2-aarch64.bin")
 // Linux VM configuration
 struct vm_config linux2 = {
     .image = {
@@ -128,7 +128,7 @@ struct vm_config linux2 = {
     .platform = {
         .cpu_num = 1,
         .region_num = 1,
-        .regions =  (struct mem_region[]) {
+        .regions =  (struct vm_mem_region[]) {
             {
                 .base = 0x40000000,
                 .size = 0x30000000,
@@ -144,7 +144,7 @@ struct vm_config linux2 = {
 
         },
         .dev_num = 2,
-        .devs =  (struct dev_region[]) {
+        .devs =  (struct vm_dev_region[]) {
             {
                 .pa = 0x90c0000,
                 .va = 0x9000000,
@@ -168,7 +168,7 @@ struct vm_config linux2 = {
 };
 
 
-VM_IMAGE(optee2_image, "../optee_os/optee/core/tee-pager_v2.bin");
+VM_IMAGE(optee2_image, "../optee_os/optee/core/tee-pager_v2.bin")
 
 struct vm_config optee2 = {
     .image = {
@@ -187,7 +187,7 @@ struct vm_config optee2 = {
     .platform = {
         .cpu_num = 1,
         .region_num = 1,
-        .regions = (struct mem_region[]) {
+        .regions = (struct vm_mem_region[]) {
             {
                 .base = 0x10100000,
                 .size = 0x00F00000, // 15 MB
@@ -202,7 +202,7 @@ struct vm_config optee2 = {
             }
         },
         .dev_num = 2,
-        .devs = (struct dev_region[]) {
+        .devs = (struct vm_dev_region[]) {
             {
                 // PL011
                 .va = 0x9040000,
@@ -234,7 +234,7 @@ struct config config = {
         [1] = { .size = 0x00200000, },
     },
     .vmlist_size = 2,
-    .vmlist = {
+    .vmlist = (struct vm_config*[]) {
         &optee,
         &optee2,
     }

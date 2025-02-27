@@ -28,7 +28,7 @@ make -C opensbi \
 	PLATFORM=generic \
 	FW_PAYLOAD=y \
 	FW_PAYLOAD_FDT_ADDR=0x80100000 \
-	FW_PAYLOAD_PATH=`pwd`/CROSSCON-Hypervisor/bin/qemu-riscv64-virt/builtin-configs/qemu-virt-riscv64-dual-vTEE/crossconhyp.bin \
+	FW_PAYLOAD_PATH=`pwd`/CROSSCON-Hypervisor/bin/qemu-riscv64-virt/qemu-virt-riscv64-dual-vTEE/crossconhyp.bin \
 	CROSS_COMPILE=riscv64-unknown-elf- \
 	-j7
 

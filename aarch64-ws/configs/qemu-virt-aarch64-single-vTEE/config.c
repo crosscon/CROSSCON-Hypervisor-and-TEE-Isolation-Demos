@@ -1,10 +1,10 @@
 #include <config.h>
 
 // Linux Image
-VM_IMAGE(linux_image, "../lloader/linux-aarch64.bin");
+VM_IMAGE(linux_image, "../lloader/linux-aarch64.bin")
 
 // Linux VM configuration
-struct vm_config linux = {
+struct vm_config linux_vm = {
     .image = {
         .base_addr = 0x40200000,
         .load_addr = VM_IMAGE_OFFSET(linux_image),
@@ -17,7 +17,7 @@ struct vm_config linux = {
     .platform = {
         .cpu_num = 1,
         .region_num = 1,
-        .regions =  (struct mem_region[]) {
+        .regions =  (struct vm_mem_region[]) {
             {
                 .base = 0x40000000,
                 .size = 0x30000000,
@@ -32,7 +32,7 @@ struct vm_config linux = {
             },
         },
         .dev_num = 2,
-        .devs =  (struct dev_region[]) {
+        .devs =  (struct vm_dev_region[]) {
             {
                 .pa = 0x9000000,
                 .va = 0x9000000,
@@ -55,7 +55,7 @@ struct vm_config linux = {
     }
 };
 
-VM_IMAGE(optee_os_image, "../optee_os/optee/core/tee-pager_v2.bin");
+VM_IMAGE(optee_os_image, "../optee_os/optee/core/tee-pager_v2.bin")
 
 
 struct vm_config optee_os = {
@@ -65,17 +65,17 @@ struct vm_config optee_os = {
         .size = VM_IMAGE_SIZE(optee_os_image),
     },
     .entry = 0x10100000,
-    .cpu_affinity = 0xf,
+    .cpu_affinity = 0x2,
 
 
     .type = 1,
 
     .children_num = 1,
-    .children = (struct vm_config*[]) { &linux },
+    .children = (struct vm_config*[]) { &linux_vm },
     .platform = {
         .cpu_num = 1,
         .region_num = 1,
-        .regions = (struct mem_region[]) {
+        .regions = (struct vm_mem_region[]) {
             {
                 .base = 0x10100000,
                 .size = 0x00F00000, // 15 MB
@@ -90,7 +90,7 @@ struct vm_config optee_os = {
             }
         },
         .dev_num = 2,
-        .devs = (struct dev_region[]) {
+        .devs = (struct vm_dev_region[]) {
             {
                 // PL011
                 .va = 0x9040000,
@@ -121,7 +121,7 @@ struct config config = {
         [0] = { .size = 0x00200000, },
     },
     .vmlist_size = 1,
-    .vmlist = {
+    .vmlist = (struct vm_config*[]) {
         &optee_os
     }
 };

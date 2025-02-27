@@ -1,10 +1,10 @@
 #include <config.h>
 
 // Linux Image
-VM_IMAGE(linux_image, "../lloader/linux-aarch64.bin");
+VM_IMAGE(linux_image, "../lloader/linux-aarch64.bin")
 
 // Linux VM configuration
-struct vm_config linux = {
+struct vm_config linux_vm = {
     .image = {
         .base_addr = 0x40200000,
         .load_addr = VM_IMAGE_OFFSET(linux_image),
@@ -17,7 +17,7 @@ struct vm_config linux = {
     .platform = {
         .cpu_num = 1,
         .region_num = 1,
-        .regions =  (struct mem_region[]) {
+        .regions =  (struct vm_mem_region[]) {
             {
                 .base = 0x40000000,
                 .size = 0x2fff0000,
@@ -32,7 +32,7 @@ struct vm_config linux = {
             },
         },
         .dev_num = 2,
-        .devs =  (struct dev_region[]) {
+        .devs =  (struct vm_dev_region[]) {
             {
                 .pa = 0x9000000,
                 .va = 0x9000000,
@@ -62,8 +62,8 @@ struct config config = {
         [1] = { .size = 0x00010000, },
     },
     .vmlist_size = 1,
-    .vmlist = {
-        &linux
+    .vmlist = (struct vm_config*[]) {
+        &linux_vm
     }
 };
 

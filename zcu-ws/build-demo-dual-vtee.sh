@@ -32,11 +32,5 @@ cp -uv ../CROSSCON-Hypervisor/bin/zcu104/builtin-configs/zcu-dual-vTEE/crossconh
 mkimage -n crossconhyp_uboot -A arm64 -O linux -C none -T kernel -a 0x200000 \
     -e 0x200000 -d bin/crossconhyp.bin bin/crossconhyp.img
 
-cp -v bin/BOOT.BIN /media/$USER/boot
-cp -v bin/crossconhyp.img /media/$USER/boot
-sync
-umount /media/$USER/boot
-
-
 
 
