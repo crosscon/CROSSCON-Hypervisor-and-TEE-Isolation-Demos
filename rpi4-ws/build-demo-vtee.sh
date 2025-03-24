@@ -25,7 +25,7 @@ make -C CROSSCON-Hypervisor/ \
         -j`nproc`
 
 cp -vr rpi4-ws/firmware/boot/start* $SDCARD
-cp -uv CROSSCON-Hypervisor/bin/rpi4/builtin-configs/rpi4-single-vTEE/crossconhyp.bin $SDCARD
+cp -uv CROSSCON-Hypervisor/bin/rpi4/rpi4-single-vTEE/crossconhyp.bin $SDCARD
 
 umount $SDCARD
 

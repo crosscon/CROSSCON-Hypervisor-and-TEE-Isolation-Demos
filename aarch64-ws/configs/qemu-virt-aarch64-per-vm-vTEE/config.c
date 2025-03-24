@@ -2,23 +2,31 @@
 // Linux Image
 VM_IMAGE(linux_image, "../lloader/linux-aarch64.bin")
 // Linux VM configuration
-struct vm_config linux = {
+struct vm_config linux_vm = {
     .image = {
-        .base_addr = 0x40200000,
+        .base_addr = 0x80200000,
         .load_addr = VM_IMAGE_OFFSET(linux_image),
         .size = VM_IMAGE_SIZE(linux_image),
     },
-    .entry = 0x40200000,
+    .entry = 0x80200000,
 
     .type = 0,
 
     .platform = {
         .cpu_num = 1,
-        .region_num = 1,
+        .region_num = 2,
         .regions =  (struct vm_mem_region[]) {
             {
-                .base = 0x40000000,
-                .size = 0x30000000,
+                .base = 0x80000000,
+                .size = 0x20000000,
+                .place_phys = true,
+                .phys = 0x80000000,
+            },
+            {
+                .base = 0xA0000000,
+                .size = 0x20000000,
+                .place_phys = true,
+                .phys = 0xA0000000,
             }
         },
         .ipc_num = 1,
@@ -68,7 +76,7 @@ struct vm_config optee = {
     .type = 1,
 
     .children_num = 1,
-    .children = (struct vm_config*[]) { &linux },
+    .children = (struct vm_config*[]) { &linux_vm },
     .platform = {
         .cpu_num = 1,
         .region_num = 1,
@@ -117,11 +125,11 @@ VM_IMAGE(linux2_image, "../lloader/linux2-aarch64.bin")
 // Linux VM configuration
 struct vm_config linux2 = {
     .image = {
-        .base_addr = 0x40200000,
+        .base_addr = 0xA0200000,
         .load_addr = VM_IMAGE_OFFSET(linux2_image),
         .size = VM_IMAGE_SIZE(linux2_image),
     },
-    .entry = 0x40200000,
+    .entry = 0xA0200000,
 
     .type = 0,
 
@@ -130,8 +138,10 @@ struct vm_config linux2 = {
         .region_num = 1,
         .regions =  (struct vm_mem_region[]) {
             {
-                .base = 0x40000000,
-                .size = 0x30000000,
+                .base = 0xA0000000,
+                .size = 0x20000000,
+                .place_phys = true,
+                .phys = 0xA0000000,
             }
         },
         .ipc_num = 1,
