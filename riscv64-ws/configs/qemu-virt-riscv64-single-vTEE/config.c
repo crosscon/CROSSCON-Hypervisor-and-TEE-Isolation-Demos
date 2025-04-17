@@ -1,11 +1,11 @@
 #include <config.h>
 
-VM_IMAGE(linux, "../lloader/linux-riscv64.bin")
+VM_IMAGE(linux_vm, "../lloader/linux-riscv64.bin")
 struct vm_config linux_vm = {
     .image = {
         .base_addr = 0x91600000,
-        .load_addr = VM_IMAGE_OFFSET(linux),
-        .size = VM_IMAGE_SIZE(linux)
+        .load_addr = VM_IMAGE_OFFSET(linux_vm),
+        .size = VM_IMAGE_SIZE(linux_vm)
     },
 
     .entry = 0x91600000,
@@ -44,11 +44,12 @@ struct vm_config linux_vm = {
 	.dev_num = 1,
 	.devs =  (struct vm_dev_region[]) {
 	    {
-		.pa = 0x10000000,
-		.va = 0x10000000,
-		.size = 0x10000,
-		.interrupt_num = 1,
-		.interrupts = (irqid_t[]) {10}
+            .id = 0,
+            .pa = 0x10000000,
+            .va = 0x10000000,
+            .size = 0x10000,
+            .interrupt_num = 1,
+            .interrupts = (irqid_t[]) {10}
 	    },
 	},
 
@@ -105,6 +106,7 @@ struct vm_config optee = {
         .devs =  (struct vm_dev_region[]) {
             {
                 /* UART */
+                .id = 0,
                 .pa = 0x10000000,
                 .va = 0x10000000,
                 .size = 0x1000,

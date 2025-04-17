@@ -11,7 +11,7 @@ make -C CROSSCON-Hypervisor/ \
 	OPTIMIZATIONS=g \
 	DEBUG=y \
         SDEES="sdSGX sdTZ" \
-        CROSS_COMPILE=/home/david/Documents/PARA/2-Areas/PhD/Research/tools/riscv-toolchain/bin/riscv64-unknown-elf- \
+        CROSS_COMPILE=riscv64-unknown-elf- \
         clean
 
 make -C CROSSCON-Hypervisor/ \
@@ -22,7 +22,7 @@ make -C CROSSCON-Hypervisor/ \
 	OPTIMIZATIONS=g \
 	DEBUG=y \
         SDEES="sdSGX sdTZ" \
-	CROSS_COMPILE=/home/david/Documents/PARA/2-Areas/PhD/Research/tools/riscv-toolchain/bin/riscv64-unknown-elf- \
+	CROSS_COMPILE=riscv64-unknown-elf- \
         -j`nproc`
 
 rm -rf opensbi/build/
@@ -31,7 +31,7 @@ make -C opensbi \
 	FW_PAYLOAD=y \
 	FW_PAYLOAD_FDT_ADDR=0x80100000 \
 	FW_PAYLOAD_PATH=../CROSSCON-Hypervisor/bin/qemu-riscv64-virt/qemu-virt-riscv64-single-vTEE/crossconhyp.bin \
-	CROSS_COMPILE=/home/david/Documents/PARA/2-Areas/PhD/Research/tools/riscv-toolchain/bin/riscv64-unknown-elf- \
+	CROSS_COMPILE=riscv64-unknown-elf- \
 	-j7
 
 cp -v opensbi/build/platform/generic/firmware/fw_payload.elf riscv64-ws/
@@ -41,7 +41,7 @@ popd
 
 ../qemu/build/riscv64-softmmu/qemu-system-riscv64 \
     -nographic \
-    -cpu rv64,priv_spec=v1.12.0,sstc=false \
+    -cpu rv64,priv_spec=v1.12.0,sstc=true \
     -M virt \
     -m 4G \
     -smp 2 \

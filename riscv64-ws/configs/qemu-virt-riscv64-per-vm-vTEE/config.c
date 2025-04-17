@@ -89,10 +89,8 @@ struct vm_config optee = {
         .regions =  (struct vm_mem_region[]) {
 
 	    {
-		.base = 0xb0000000,
-		.size = 0x00f00000,
-                .place_phys = true,
-                .phys = 0xa0000000
+            .base = 0xb0000000,
+            .size = 0x00f00000,
 	    },
 
         },
@@ -125,7 +123,6 @@ struct vm_config optee = {
         }
     },
 };
-
 
 VM_IMAGE(linux2_img, "../lloader/linux2-riscv64.bin")
 struct vm_config linux2 = {
@@ -191,8 +188,6 @@ struct vm_config linux2 = {
     },
 };
 
-
-
 VM_IMAGE(optee2_img, "../optee_os/optee-riscv/core/tee.bin")
 struct vm_config optee2 = {
     .image = {
@@ -252,7 +247,6 @@ struct vm_config optee2 = {
     },
 };
 
-
 struct config config = {
 
     CONFIG_HEADER
@@ -269,5 +263,4 @@ struct config config = {
         &optee2,
     }
 };
-
 
