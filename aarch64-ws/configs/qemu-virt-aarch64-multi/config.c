@@ -27,7 +27,7 @@ struct vm_config baremetal = {
             {
                 /* PL011 */
                 .pa = 0x90c0000,
-                .va = 0x9000001,
+                .va = 0x9000000,
                 .size = 0x10000,
             },
             {
@@ -111,11 +111,11 @@ VM_IMAGE(linux_image, "../lloader/linux-aarch64.bin")
 // Linux VM configuration
 struct vm_config linux_vm = {
     .image = {
-        .base_addr = 0x40200000,
+        .base_addr = 0x80200000,
         .load_addr = VM_IMAGE_OFFSET(linux_image),
         .size = VM_IMAGE_SIZE(linux_image),
     },
-    .entry = 0x40200000,
+    .entry = 0x80200000,
 
     .type = 0,
 
@@ -124,8 +124,8 @@ struct vm_config linux_vm = {
         .region_num = 1,
         .regions =  (struct vm_mem_region[]) {
             {
-                .base = 0x40000000,
-                .size = 0x30000000,
+                .base = 0x80000000,
+                .size = 0x20000000,
             }
         },
         .ipc_num = 1,
