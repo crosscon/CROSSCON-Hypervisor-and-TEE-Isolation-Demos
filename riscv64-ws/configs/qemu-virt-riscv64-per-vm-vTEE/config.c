@@ -24,7 +24,7 @@ struct vm_config linux_vm = {
 
 	    },
 	    /* { */
-		/* /1* HOLE FOR IPC *1/ */
+		/* HOLE FOR IPC */
 		/* .base = 0x88f00000, */
                 /* .size = 0x00200000, */
 	    /* }, */
@@ -151,7 +151,7 @@ struct vm_config linux2 = {
 		.size = 0x07d00000
 	    },
 	    /* { */
-		/* /1* HOLE FOR IPC *1/ */
+		/* HOLE FOR IPC */
 		/* .base = 0x88f00000, */
                 /* .size = 0x00200000, */
 	    /* }, */

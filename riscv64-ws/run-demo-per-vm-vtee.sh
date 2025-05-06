@@ -39,9 +39,9 @@ cp -v opensbi/build/platform/generic/firmware/fw_payload.elf ./riscv64-ws
 popd
 
 
-../qemu/build/riscv64-softmmu/qemu-system-riscv64 \
+../qemu/build/qemu-system-riscv64 \
     -nographic \
-    -cpu rv64,priv_spec=v1.12.0,sstc=false \
+    -cpu rv64,priv_spec=v1.12.0,sstc=true \
     -M virt \
     -m 4G \
     -smp 2 \
