@@ -57,3 +57,5 @@ dkms.conf
 *out*
 *build*
 *.S
+
+qemu/
