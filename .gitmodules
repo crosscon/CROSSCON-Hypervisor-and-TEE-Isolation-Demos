@@ -1,6 +1,6 @@
 [submodule "CROSSCON-Hypervisor"]
 	path = CROSSCON-Hypervisor
-	url = git@github.com:crosscon/CROSSCON-Hypervisor.git
+	url = https://github.com/3mdeb/CROSSCON-Hypervisor
 [submodule "optee_client"]
 	path = optee_client
 	url = git@github.com:crosscon/optee_client.git
@@ -19,3 +19,16 @@
 [submodule "bitcoin-wallet"]
 	path = bitcoin-wallet
 	url = git@github.com:crosscon/bitcoin-wallet.git
+[submodule "security_test/armageddon"]
+	path = security_test/armageddon
+	url = https://github.com/isec-tugraz/armageddon.git
+	ignore = dirty
+[submodule "buildroot"]
+	path = buildroot
+	url = https://github.com/buildroot/buildroot.git
+[submodule "optee_os_cba"]
+	path = optee_os_cba
+	url = git@github.com:crosscon/context-based-auth-optee-os.git
+[submodule "cba_ta"]
+	path = cba_ta
+	url = git@github.com:crosscon/context-based-auth-trusted-application.git
